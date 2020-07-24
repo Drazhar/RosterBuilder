@@ -1,0 +1,20 @@
+{
+  "name": "roster-creator",
+  "version": "1.0.0",
+  "description": "The backend for the roster creator",
+  "main": "server.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "lit-element": "^2.3.1"
+  },
+  "devDependencies": {
+    "jest": "^26.1.0",
+    "nodemon": "^2.0.4"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "Philip Trauth",
+  "license": "ISC"
+}
