@@ -1,108 +1,4 @@
-let employeeInformationTemp = [
-  {
-    id: 1,
-    name: "Mila",
-    plannedWorkingTime: 240,
-    overtime: 0,
-    consecutiveWorkingDays: {
-      min: 3,
-      max: 5,
-      prefered: 4,
-    },
-    minConsecutiveDaysOff: 2,
-    shift: {
-      distribution: [0, 1, 1, 1],
-    },
-  },
-  {
-    id: 2,
-    name: "Philip",
-    plannedWorkingTime: 240,
-    overtime: 0,
-    consecutiveWorkingDays: {
-      min: 3,
-      max: 5,
-      prefered: 4,
-    },
-    minConsecutiveDaysOff: 2,
-    shift: {
-      distribution: [0, 1, 1, 1],
-    },
-  },
-  {
-    id: 3,
-    name: "Hans",
-    plannedWorkingTime: 240,
-    overtime: 0,
-    consecutiveWorkingDays: {
-      min: 3,
-      max: 5,
-      prefered: 4,
-    },
-    minConsecutiveDaysOff: 2,
-    shift: {
-      distribution: [0, 1, 1, 1],
-    },
-  },
-  {
-    id: 4,
-    name: "Andreas",
-    plannedWorkingTime: 240,
-    overtime: 0,
-    consecutiveWorkingDays: {
-      min: 3,
-      max: 5,
-      prefered: 4,
-    },
-    minConsecutiveDaysOff: 2,
-    shift: {
-      distribution: [0, 1, 1, 1],
-    },
-  },
-  {
-    id: 5,
-    name: "Bernd",
-    plannedWorkingTime: 240,
-    overtime: 0,
-    consecutiveWorkingDays: {
-      min: 3,
-      max: 5,
-      prefered: 4,
-    },
-    minConsecutiveDaysOff: 2,
-    shift: {
-      distribution: [0, 1, 1, 1],
-    },
-  },
-];
-
-// shiftInformation[0] should always be a non working day.
-let shiftInformationTemp = [
-  {
-    name: " ",
-    workingHours: 0,
-    autoAssign: true,
-  },
-  {
-    name: "D",
-    workingHours: 12,
-    autoAssign: true,
-    requiredEmployees: 1,
-  },
-  {
-    name: "N",
-    workingHours: 12,
-    autoAssign: true,
-    requiredEmployees: 1,
-  },
-  {
-    name: "T",
-    workingHours: 12,
-    autoAssign: false,
-    requiredEmployees: 1,
-    //interchangeableWith: [1]
-  },
-];
+const { employeeInformationTemp, shiftInformationTemp } = require("./input");
 
 module.exports = function runScheduler(
   iterations = 1,
@@ -111,7 +7,7 @@ module.exports = function runScheduler(
 ) {
   let createdSchedules = []; // This array will store all informations for the employees and the shift assignments created. It will get huge.
   let qualityRatings = [];
-  const numberOfDays = 50; // This should be set outside of the function later.
+  const numberOfDays = 45; // This should be set outside of the function later.
 
   let minTotalHourDifference = Infinity;
 

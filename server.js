@@ -10,7 +10,7 @@ const port = 3000;
 app.use(express.static("public"));
 
 // Middleware
-app.use(express.json({ limit: "200kb" }));
+app.use(express.json({ limit: "500kb" }));
 
 // Send HTML files
 app.get("/", (req, res) => res.sendFile("index.html"));
@@ -34,7 +34,6 @@ app.post("/api/createSchedule", (req, res) => {
       result: [],
     })
   );
-  //myWorker.on("exit", (code) => console.log(code));
 });
 
 // listen to something
