@@ -11,6 +11,18 @@
     <title>Rosterer</title>
   </head>
   <body>
+    <script>
+      function showScheduler() {
+        document.querySelector("#scheduler").display = true;
+        document.querySelector("#settings").display = false;
+        sessionStorage.setItem("lastView", "scheduler");
+      }
+      function showSetup() {
+        document.querySelector("#scheduler").display = false;
+        document.querySelector("#settings").display = true;
+        sessionStorage.setItem("lastView", "settings");
+      }
+    </script>
     <nav class="stroke">
       <div class="logo-nav">
         <div class="logo">
@@ -18,58 +30,18 @@
         </div>
         <ul class="nav-links">
           <li>
-            <a href="#">Planner</a>
+            <a onclick="showScheduler()">Create</a>
           </li>
           <li>
-            <a href="#">Setup</a>
+            <a onclick="showSetup()">Settings</a>
           </li>
         </ul>
-      </div>
-      <div class="login">
-        Login
       </div>
     </nav>
 
     <main>
-      <button id="test">Test</button>
-      <!-- Testing HTMLElements -->
-      <shift-schedule></shift-schedule>
-      <!-- Table dummy layout -->
-      <!-- <table>
-        <thead>
-          <tr>
-            <th></th>
-            <th>Day 1</th>
-            <th>Day 2</th>
-            <th>Day 3</th>
-            <th>Day 4</th>
-            <th>Day 5</th>
-            <th>Day 6</th>
-            <th>Day 7</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Mila</td>
-            <td colspan="4" class="shift1">Day</td>
-            <td colspan="2" class="off"></td>
-            <td class="shift2">NightShift</td>
-          </tr>
-          <tr>
-            <td>Philip</td>
-            <td colspan="2" class="shift2">Night</td>
-            <td colspan="2" class="off"></td>
-            <td colspan="3" class="shift1">Day</td>
-          </tr>
-          <tr>
-            <td>Hans</td>
-            <td colspan="2" class="off"></td>
-            <td colspan="4" class="shift2">Night</td>
-            <td class="off"></td>
-          </tr>
-        </tbody>
-      </table> -->
-      <!-- End Table dummy -->
+      <shift-schedule id="scheduler"></shift-schedule>
+      <settings-view id="settings"></settings-view>
     </main>
 
     <script type="module" src="app.js"></script>

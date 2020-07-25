@@ -11,6 +11,14 @@ app.use(express.static("public"));
 
 // Middleware
 app.use(express.json({ limit: "500kb" }));
+app.use(function (req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  next();
+});
 
 // Send HTML files
 app.get("/", (req, res) => res.sendFile("index.html"));
@@ -34,6 +42,11 @@ app.post("/api/createSchedule", (req, res) => {
       result: [],
     })
   );
+});
+
+// Route everything else to the root
+app.get("*", (req, res) => {
+  res.redirect("/");
 });
 
 // listen to something
