@@ -4,15 +4,15 @@
   "description": "The backend for the roster creator",
   "main": "server.js",
   "dependencies": {
-    "express": "^4.17.1",
-    "lit-element": "^2.3.1"
+    "express": "^4.17.1"
   },
   "devDependencies": {
+    "@babel/plugin-transform-modules-commonjs": "^7.10.4",
     "jest": "^26.1.0",
     "nodemon": "^2.0.4"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "start": "node server.js"
   },
   "author": "Philip Trauth",

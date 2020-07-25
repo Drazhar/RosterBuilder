@@ -2,7 +2,7 @@ let employeeInformationTemp = [
   {
     id: 1,
     name: "Mila",
-    plannedWorkingTime: 144,
+    plannedWorkingTime: 240,
     overtime: 0,
     consecutiveWorkingDays: {
       min: 3,
@@ -17,7 +17,7 @@ let employeeInformationTemp = [
   {
     id: 2,
     name: "Philip",
-    plannedWorkingTime: 144,
+    plannedWorkingTime: 240,
     overtime: 0,
     consecutiveWorkingDays: {
       min: 3,
@@ -32,7 +32,7 @@ let employeeInformationTemp = [
   {
     id: 3,
     name: "Hans",
-    plannedWorkingTime: 144,
+    plannedWorkingTime: 240,
     overtime: 0,
     consecutiveWorkingDays: {
       min: 3,
@@ -47,7 +47,7 @@ let employeeInformationTemp = [
   {
     id: 4,
     name: "Andreas",
-    plannedWorkingTime: 144,
+    plannedWorkingTime: 240,
     overtime: 0,
     consecutiveWorkingDays: {
       min: 3,
@@ -62,7 +62,7 @@ let employeeInformationTemp = [
   {
     id: 5,
     name: "Bernd",
-    plannedWorkingTime: 144,
+    plannedWorkingTime: 240,
     overtime: 0,
     consecutiveWorkingDays: {
       min: 3,
@@ -111,7 +111,7 @@ module.exports = function runScheduler(
 ) {
   let createdSchedules = []; // This array will store all informations for the employees and the shift assignments created. It will get huge.
   let qualityRatings = [];
-  const numberOfDays = 30; // This should be set outside of the function later.
+  const numberOfDays = 50; // This should be set outside of the function later.
 
   let minTotalHourDifference = Infinity;
 
@@ -198,6 +198,7 @@ module.exports = function runScheduler(
         shiftInformation[shift].name;
     });
   });
+  createdSchedules[bestIndex][0].quality = qualityRatings[bestIndex];
   return createdSchedules[bestIndex];
 };
 
