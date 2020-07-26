@@ -1,4 +1,104 @@
+/* BASE VARIABLES */
 :root {
+  --base-color: rgb(18, 170, 236);
+  --sec-color: rgba(18, 170, 236, 0.45);
+  --nav-color: rgb(57, 62, 70);
+  --background-color: rgba(57, 62, 70, 0.1);
+}
+
+/* BASE SETTINGS */
+* {
+  font-family: "Poppins", sans-serif;
+  padding: 0;
+  margin: 0;
+}
+
+/* LAYOUT */
+body {
+  display: grid;
+  grid-template-columns: 160px auto;
+}
+
+nav {
+  background-color: var(--nav-color);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+}
+
+main {
+  background-color: var(--background-color);
+}
+
+.logo {
+  padding-bottom: 8vh;
+}
+
+/* BUTTONS */
+.button {
+  background: none;
+  letter-spacing: 1px;
+  outline: none;
+  border: none;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  color: white;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 1vh 0 1vh 0;
+  margin: 0.5vh 0 0.5vh 0;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  user-select: none;
+}
+
+.button p,
+.button img {
+  z-index: 1;
+  padding: 0;
+}
+
+.button::before {
+  content: "";
+  position: absolute;
+  height: 0;
+  width: 0;
+  left: 0;
+  box-shadow: 0 0 0 var(--base-color);
+  border-radius: 100%;
+  background: var(--base-color);
+  opacity: 1;
+  transition: 0.3s ease-out;
+}
+
+.button:hover {
+  cursor: pointer;
+}
+
+.button:hover::before {
+  /* left: 0; */
+  /* border-radius: 0; */
+  width: 200%;
+  height: 400%;
+}
+
+.button:active::before {
+  left: 96%;
+  width: 4%;
+  box-shadow: -1px 0 22px var(--base-color);
+}
+
+.button img {
+  width: 28px;
+  padding: 0 8px 0 8px;
+}
+
+/* :root {
   --davys-grey: hsla(90, 1%, 31%, 1);
   --fire-opal: hsla(1, 85%, 65%, 1);
   --naples-yellow: hsla(48, 100%, 70%, 1);
@@ -105,13 +205,11 @@ nav.stroke a:hover::after {
   width: 100%;
 }
 
-/* TEST BUTTON */
 #test {
   color: lightgray;
 }
 
-/* FOR THE CALENDAR */
 main {
   padding: 10px;
   z-index: -1;
-}
+} */
