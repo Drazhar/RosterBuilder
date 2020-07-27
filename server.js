@@ -7,7 +7,7 @@ const app = express();
 const port = 3000;
 
 // Static routes
-app.use(express.static("public"));
+app.use(express.static("static"));
 
 // Middleware
 app.use(express.json({ limit: "500kb" }));

@@ -1,19 +1,37 @@
 {
   "name": "roster-creator",
   "version": "1.0.0",
-  "description": "The backend for the roster creator",
+  "private": true,
+  "description": "Back- and Frontend for the application to create a roster.",
   "main": "server.js",
   "dependencies": {
     "express": "^4.17.1"
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.10.4",
+    "clean-webpack-plugin": "^2.0.0",
+    "css-loader": "^4.0.0",
+    "file-loader": "^6.0.0",
+    "html-loader": "^1.1.0",
+    "html-webpack-plugin": "^4.3.0",
     "jest": "^26.1.0",
-    "nodemon": "^2.0.4"
+    "lit-element": "^2.3.1",
+    "mini-css-extract-plugin": "^0.9.0",
+    "node-sass": "^4.14.1",
+    "nodemon": "^2.0.4",
+    "optimize-css-assets-webpack-plugin": "^5.0.3",
+    "sass-loader": "^9.0.2",
+    "style-loader": "^1.2.1",
+    "webpack": "^4.44.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0",
+    "webpack-merge": "^4.2.1"
   },
   "scripts": {
+    "start": "webpack-dev-server  --config webpack.dev.js --open",
+    "build": "webpack --config webpack.prod.js",
     "test": "jest",
-    "start": "node server.js"
+    "node": "node server.js"
   },
   "author": "Philip Trauth",
   "license": "ISC"
