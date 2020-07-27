@@ -1,0 +1,99 @@
+/* BASE VARIABLES */
+$base-color: rgb(18, 170, 236);
+$sec-color: rgba(18, 170, 236, 0.45);
+$nav-color: rgb(57, 62, 70);
+$background-color: rgba(57, 62, 70, 0.1);
+
+/* BASE SETTINGS */
+* {
+  font-family: "Poppins", sans-serif;
+  padding: 0;
+  margin: 0;
+}
+
+/* LAYOUT */
+body {
+  display: grid;
+  grid-template-columns: 160px auto;
+}
+
+nav {
+  background-color: $nav-color;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: start;
+}
+
+main {
+  background-color: $background-color;
+  background: radial-gradient(
+    100vmax 100vmax at 30% 50%,
+    rgba(85, 101, 128, 0.1) 0%,
+    rgba(57, 62, 70, 0.2) 100%
+  );
+  background-image: url(svg/background.svg);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.logo {
+  padding-bottom: 8vh;
+}
+
+/* BUTTONS */
+.button {
+  background: none;
+  letter-spacing: 1px;
+  outline: none;
+  border: none;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  color: white;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 16px;
+  padding: 1vh 0 1vh 0;
+  margin: 0.5vh 0 0.5vh 0;
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  user-select: none;
+
+  p,
+  img {
+    z-index: 1;
+    width: 28px;
+    padding: 0 8px 0 8px;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    height: 0;
+    width: 0;
+    left: 0;
+    box-shadow: 0 0 0 $base-color;
+    border-radius: 100%;
+    background: $base-color;
+    opacity: 1;
+    transition: 0.3s ease-out;
+  }
+}
+
+.button:hover {
+  cursor: pointer;
+
+  &::before {
+    width: 200%;
+    height: 400%;
+  }
+
+  &:active::before {
+    left: 96%;
+    width: 4%;
+    box-shadow: -1px 0 22px $base-color;
+  }
+}

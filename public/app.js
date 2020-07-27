@@ -1,2 +1,4 @@
-import "./views/shiftSchedule-view.js";
-import "./views/settings-view.js";
+// import "./views/shiftSchedule-view";
+import "./views/employees-view";
+// import "./views/testing-view";
+import "./style.scss";

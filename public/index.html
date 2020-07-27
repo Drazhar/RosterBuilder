@@ -3,47 +3,47 @@
   <head>
     <meta charset="UTF-8" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700;900&family=Roboto&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rosterer</title>
+    <title>Roster Builder</title>
   </head>
   <body>
-    <script>
-      function showScheduler() {
-        document.querySelector("#scheduler").display = true;
-        document.querySelector("#settings").display = false;
-        sessionStorage.setItem("lastView", "scheduler");
-      }
-      function showSetup() {
-        document.querySelector("#scheduler").display = false;
-        document.querySelector("#settings").display = true;
-        sessionStorage.setItem("lastView", "settings");
-      }
-    </script>
-    <nav class="stroke">
-      <div class="logo-nav">
-        <div class="logo">
-          Roster Builder
-        </div>
-        <ul class="nav-links">
-          <li>
-            <a onclick="showScheduler()">Create</a>
-          </li>
-          <li>
-            <a onclick="showSetup()">Settings</a>
-          </li>
-        </ul>
+    <nav>
+      <div class="logo">
+        <img src="./svg/logo.svg" alt="RosterBuilder logo" />
       </div>
+      <ul>
+        <li>
+          <button class="button">
+            <img src="./svg/face.svg" alt="Employee icon" />
+            <p>Employees</p>
+          </button>
+        </li>
+        <li>
+          <button class="button">
+            <img src="./svg/work_outline.svg" alt="Case icon" />
+            <p>Shifts</p>
+          </button>
+        </li>
+        <li>
+          <button class="button">
+            <img src="./svg/settings.svg" alt="Settings icon" />
+            <p>Settings</p>
+          </button>
+        </li>
+        <li>
+          <button class="button">
+            <img src="./svg/schedule.svg" alt="Schedule icon" />
+            <p>Create</p>
+          </button>
+        </li>
+      </ul>
     </nav>
 
     <main>
-      <shift-schedule id="scheduler"></shift-schedule>
-      <settings-view id="settings"></settings-view>
+      <employees-view></employees-view>
     </main>
-
-    <script type="module" src="app.js"></script>
   </body>
 </html>
