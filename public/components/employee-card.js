@@ -11,6 +11,27 @@ class EmployeeCard extends LitElement {
     super();
   }
 
+  // Template for custom events
+  removeThisEmployee() {
+    this.dispatchEvent(
+      new CustomEvent("remove-me", {
+        detail: {
+          name: this.name,
+        },
+      })
+    );
+  }
+
+  editThisEmployee() {
+    this.dispatchEvent(
+      new CustomEvent("edit-me", {
+        detail: {
+          name: this.name,
+        },
+      })
+    );
+  }
+
   render() {
     return html`
       <div class="card">
@@ -18,6 +39,8 @@ class EmployeeCard extends LitElement {
           src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairBun&accessoriesType=Blank&hairColor=PastelPink&facialHairType=Blank&facialHairColor=Blonde&clotheType=Hoodie&clotheColor=Pink&eyeType=Dizzy&eyebrowType=RaisedExcitedNatural&mouthType=Default&skinColor=Pale"
         />
         ${this.name}
+        <button @click=${this.removeThisEmployee}>Remove</button>
+        <button @click=${this.editThisEmployee}>Edit</button>
       </div>
     `;
   }

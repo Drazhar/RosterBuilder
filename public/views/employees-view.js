@@ -1,19 +1,70 @@
 import { LitElement, html, css } from "lit-element";
+import "../components/employee-card.js";
+import "../components/edit-employee.js";
 
 class EmployeesView extends LitElement {
+  static get properties() {
+    return {
+      employees: { type: Array },
+      editEmployee: { type: Boolean },
+    };
+  }
+
   constructor() {
     super();
+    this.editEmployee = false;
+    if (window.localStorage.getItem("definedEmployees") === "null") {
+      this.employees = [];
+    } else {
+      this.employees = JSON.parse(
+        window.localStorage.getItem("definedEmployees")
+      );
+    }
+  }
+
+  updated(changedProperties) {
+    window.localStorage.setItem(
+      "definedEmployees",
+      JSON.stringify(this.employees)
+    );
+  }
+
+  // Add a new employee to the list
+  addNewEmployee() {
+    this.employees = [...this.employees, "The new one"];
+  }
+
+  openEditEmployee() {
+    this.editEmployee = true;
+  }
+
+  closeEditEmployee() {
+    this.editEmployee = false;
+  }
+
+  removeEmployee(event) {
+    this.employees = [
+      ...this.employees.filter((item) => item !== event.detail.name),
+    ];
   }
 
   render() {
     return html`
+      ${this.editEmployee
+        ? html`<edit-employee
+            @close-me="${this.closeEditEmployee}"
+          ></edit-employee>`
+        : ""}
       <div class="cardWrapper">
-        <employee-card name="Mila Trauth"></employee-card>
-        <employee-card name="Philip Trauth"></employee-card>
-        <employee-card name="Jim Trauth"></employee-card>
-        <employee-card name="Leo Trauth"></employee-card>
-        <employee-card name="Martina Trauth"></employee-card>
-        <div class="addNew">
+        ${this.employees.map(
+          (employee) =>
+            html`<employee-card
+              name="${employee}"
+              @remove-me="${this.removeEmployee}"
+              @edit-me="${this.openEditEmployee}"
+            ></employee-card>`
+        )}
+        <div @click="${this.addNewEmployee}" class="addNew">
           +
         </div>
       </div>
