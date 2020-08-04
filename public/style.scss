@@ -42,7 +42,9 @@ main {
 }
 
 /* BUTTONS */
-.button {
+.button,
+.active {
+  text-decoration: none;
   background: none;
   letter-spacing: 1px;
   outline: none;
@@ -79,7 +81,7 @@ main {
     border-radius: 100%;
     background: $base-color;
     opacity: 1;
-    transition: 0.3s ease-out;
+    transition: 0.2s ease-out;
   }
 }
 
@@ -90,10 +92,19 @@ main {
     width: 200%;
     height: 400%;
   }
+}
 
-  &:active::before {
-    left: 96%;
-    width: 4%;
-    box-shadow: -1px 0 22px $base-color;
-  }
+button:active::before,
+.active::before {
+  left: 96%;
+  width: 4%;
+  height: 400%;
+  box-shadow: -1px 0 160px $base-color, -1px 0 140px $base-color,
+    -1px 0 120px $base-color, -1px 0 100px $base-color, -1px 0 70px $base-color,
+    -1px 0 22px $base-color;
+}
+
+.active:hover::before {
+  left: 96%;
+  width: 4%;
 }

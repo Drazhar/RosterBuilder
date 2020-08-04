@@ -1,25 +1,15 @@
 import { LitElement, html, css } from "lit-element";
-import { scheduleConverter } from "./../src/scheduleConverter.js";
+import { scheduleConverter } from "../src/scheduleConverter";
 
 class shiftSchedule extends LitElement {
   static get properties() {
     return {
       scheduleToDisplay: { type: Array },
-      display: { type: Boolean },
     };
   }
 
   constructor() {
     super();
-
-    if (
-      sessionStorage.getItem("lastView") === null ||
-      sessionStorage.getItem("lastView") === "scheduler"
-    ) {
-      this.display = true;
-    } else {
-      this.display = false;
-    }
 
     if (localStorage.getItem("lastSchedule") !== null) {
       this.scheduleToDisplay = JSON.parse(localStorage.getItem("lastSchedule"));
@@ -37,7 +27,6 @@ class shiftSchedule extends LitElement {
 
   async btnCreateSchedule() {
     const createdSchedule = await this.createSchedule();
-    console.log(this.display);
     if (createdSchedule.status === "success") {
       this.scheduleToDisplay = createdSchedule.result;
       localStorage.setItem(
@@ -65,76 +54,72 @@ class shiftSchedule extends LitElement {
   }
 
   render() {
-    if (this.display) {
-      return html`
-        <table>
-          <col span="1" class="fixedWidth" />
-          <thead>
-            <tr>
-              <th></th>
-              ${this.scheduleToDisplay[0].assignedShifts.map(
-                (item, index) => html`<th>${index}</th>`
-              )}
-              <th>WH</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${this.scheduleToDisplay.map((item, index) => {
-              return html`
-                <tr>
-                  <th class="employeeNames">${item.information.name}</th>
-                  ${scheduleConverter(item.assignedShifts).map((assigned) => {
-                    return html`
-                      <td colspan=${assigned.count} class="${assigned.value}">
-                        ${assigned.value !== " "
-                          ? assigned.value + " " + assigned.count
-                          : ""}
-                      </td>
-                    `;
-                  })}
-                  <td>
-                    ${item.schedulingInformation.hoursWorked}
-                  </td>
-                </tr>
-              `;
-            })}
-          </tbody>
-        </table>
+    return html`
+      <table>
+        <col span="1" class="fixedWidth" />
+        <thead>
+          <tr>
+            <th></th>
+            ${this.scheduleToDisplay[0].assignedShifts.map(
+              (item, index) => html`<th>${index}</th>`
+            )}
+            <th>WH</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${this.scheduleToDisplay.map((item, index) => {
+            return html`
+              <tr>
+                <th class="employeeNames">${item.information.name}</th>
+                ${scheduleConverter(item.assignedShifts).map((assigned) => {
+                  return html`
+                    <td colspan=${assigned.count} class="${assigned.value}">
+                      ${assigned.value !== " "
+                        ? assigned.value + " " + assigned.count
+                        : ""}
+                    </td>
+                  `;
+                })}
+                <td>
+                  ${item.schedulingInformation.hoursWorked}
+                </td>
+              </tr>
+            `;
+          })}
+        </tbody>
+      </table>
 
-        <table>
-          <tbody>
-            <tr>
-              <td>Quality consecutive days off</td>
-              <td>
-                ${Math.round(
-                  this.scheduleToDisplay[0].quality.minConsecutiveDaysOffCheck *
-                    1000
-                ) / 1000}
-              </td>
-            </tr>
-            <tr>
-              <td>Shift distribution</td>
-              <td>
-                ${Math.round(
-                  this.scheduleToDisplay[0].quality.shiftDistribution * 1000
-                ) / 1000}
-              </td>
-            </tr>
-            <tr>
-              <td>Squared total hour difference</td>
-              <td>
-                ${Math.round(
-                  this.scheduleToDisplay[0].quality.totalHourDifference * 1000
-                ) / 1000}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <button @click="${this.btnCreateSchedule}">Create new roster</button>
-      `;
-    } else {
-      return html``;
-    }
+      <table>
+        <tbody>
+          <tr>
+            <td>Quality consecutive days off</td>
+            <td>
+              ${Math.round(
+                this.scheduleToDisplay[0].quality.minConsecutiveDaysOffCheck *
+                  1000
+              ) / 1000}
+            </td>
+          </tr>
+          <tr>
+            <td>Shift distribution</td>
+            <td>
+              ${Math.round(
+                this.scheduleToDisplay[0].quality.shiftDistribution * 1000
+              ) / 1000}
+            </td>
+          </tr>
+          <tr>
+            <td>Squared total hour difference</td>
+            <td>
+              ${Math.round(
+                this.scheduleToDisplay[0].quality.totalHourDifference * 1000
+              ) / 1000}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button @click="${this.btnCreateSchedule}">Create new roster</button>
+    `;
   }
 
   static get styles() {
@@ -151,7 +136,7 @@ class shiftSchedule extends LitElement {
         background-color: rgb(20, 20, 20);
         table-layout: fixed;
         overflow: hidden;
-        width: 100%;
+        width: 99%;
       }
 
       td,

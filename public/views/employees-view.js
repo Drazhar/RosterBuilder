@@ -1,12 +1,14 @@
 import { LitElement, html, css } from "lit-element";
 import "../components/employee-card.js";
 import "../components/edit-employee.js";
+import { nanoid } from "nanoid";
 
 class EmployeesView extends LitElement {
   static get properties() {
     return {
       employees: { type: Array },
       editEmployee: { type: Boolean },
+      editEmployeeObject: { type: Object },
     };
   }
 
@@ -31,10 +33,22 @@ class EmployeesView extends LitElement {
 
   // Add a new employee to the list
   addNewEmployee() {
-    this.employees = [...this.employees, "The new one"];
+    const newId = nanoid(10);
+    this.employees = [
+      ...this.employees,
+      {
+        id: newId,
+        name: "New Employee",
+        avatar: `https://avatars.dicebear.com/api/avataaars/${newId}.svg?options[style]=circle`,
+      },
+    ];
+    this.openEditEmployee({ detail: { id: newId } });
   }
 
-  openEditEmployee() {
+  openEditEmployee(event) {
+    this.editEmployeeObject = this.employees.filter(
+      (item) => item.id === event.detail.id
+    )[0];
     this.editEmployee = true;
   }
 
@@ -44,22 +58,38 @@ class EmployeesView extends LitElement {
 
   removeEmployee(event) {
     this.employees = [
-      ...this.employees.filter((item) => item !== event.detail.name),
+      ...this.employees.filter((item) => item.id !== event.detail.id),
     ];
+  }
+
+  updateEmployee(event) {
+    for (let i = 0; i < this.employees.length; i++) {
+      if (this.employees[i].id === event.detail.id) {
+        this.employees[i] = event.detail;
+        break;
+      }
+    }
+    this.editEmployee = false;
   }
 
   render() {
     return html`
       ${this.editEmployee
         ? html`<edit-employee
+            id="${this.editEmployeeObject.id}"
+            name="${this.editEmployeeObject.name}"
+            avatar="${this.editEmployeeObject.avatar}"
             @close-me="${this.closeEditEmployee}"
+            @update-me="${this.updateEmployee}"
           ></edit-employee>`
         : ""}
       <div class="cardWrapper">
         ${this.employees.map(
           (employee) =>
             html`<employee-card
-              name="${employee}"
+              id="${employee.id}"
+              name="${employee.name}"
+              avatar="${employee.avatar}"
               @remove-me="${this.removeEmployee}"
               @edit-me="${this.openEditEmployee}"
             ></employee-card>`

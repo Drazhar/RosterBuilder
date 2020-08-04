@@ -2,7 +2,11 @@ import { LitElement, html, css } from "lit-element";
 
 class EditEmployee extends LitElement {
   static get properties() {
-    return {};
+    return {
+      id: { type: String },
+      name: { type: String },
+      avatar: { type: String },
+    };
   }
 
   constructor() {
@@ -13,20 +17,34 @@ class EditEmployee extends LitElement {
     this.dispatchEvent(new CustomEvent("close-me", {}));
   }
 
+  saveChanges(event) {
+    event.preventDefault();
+
+    this.dispatchEvent(
+      new CustomEvent("update-me", {
+        detail: {
+          id: this.id,
+          name: this.shadowRoot.getElementById("name").value,
+          avatar: this.avatar,
+        },
+      })
+    );
+  }
+
   render() {
     return html`
-      <div class="greyout" @click="${this.sendCloseEvent}">
+      <div class="greyout">
         <div class="edit">
-          <img
-            src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairBun&accessoriesType=Blank&hairColor=PastelPink&facialHairType=Blank&facialHairColor=Blonde&clotheType=Hoodie&clotheColor=Pink&eyeType=Dizzy&eyebrowType=RaisedExcitedNatural&mouthType=Default&skinColor=Pale"
-          />
+          <img src="${this.avatar}" />
           <button @click="${this.sendCloseEvent}">X</button>
           <form>
             <div class="inputGroup">
-              <label>Name: </label>
-              <input type="text" id="name" value="name" isRequired />
+              <label
+                >Name:
+                <input type="text" id="name" value="${this.name}" isRequired />
+              </label>
             </div>
-            <button type="submit">Save</button>
+            <button type="submit" @click="${this.saveChanges}">Save</button>
           </form>
         </div>
       </div>
@@ -35,6 +53,10 @@ class EditEmployee extends LitElement {
 
   static get styles() {
     return css`
+      img {
+        width: 90px;
+      }
+
       .greyout {
         background-color: rgba(70, 70, 70, 0.7);
         position: absolute;

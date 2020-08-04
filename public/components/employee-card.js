@@ -3,7 +3,9 @@ import { LitElement, html, css } from "lit-element";
 class EmployeeCard extends LitElement {
   static get properties() {
     return {
+      id: { type: String },
       name: { type: String },
+      avatar: { type: String },
     };
   }
 
@@ -12,21 +14,22 @@ class EmployeeCard extends LitElement {
   }
 
   // Template for custom events
-  removeThisEmployee() {
+  removeThisEmployee(event) {
     this.dispatchEvent(
       new CustomEvent("remove-me", {
         detail: {
-          name: this.name,
+          id: this.id,
         },
       })
     );
+    event.stopPropagation(); // This line is needed to prevent that the edit event gets also triggered by clicking the div.
   }
 
   editThisEmployee() {
     this.dispatchEvent(
       new CustomEvent("edit-me", {
         detail: {
-          name: this.name,
+          id: this.id,
         },
       })
     );
@@ -34,13 +37,10 @@ class EmployeeCard extends LitElement {
 
   render() {
     return html`
-      <div class="card">
-        <img
-          src="https://avataaars.io/?avatarStyle=Circle&topType=LongHairBun&accessoriesType=Blank&hairColor=PastelPink&facialHairType=Blank&facialHairColor=Blonde&clotheType=Hoodie&clotheColor=Pink&eyeType=Dizzy&eyebrowType=RaisedExcitedNatural&mouthType=Default&skinColor=Pale"
-        />
+      <div class="card" @click=${this.editThisEmployee}>
+        <img src="${this.avatar}" />
         ${this.name}
         <button @click=${this.removeThisEmployee}>Remove</button>
-        <button @click=${this.editThisEmployee}>Edit</button>
       </div>
     `;
   }

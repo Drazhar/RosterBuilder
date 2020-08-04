@@ -8,15 +8,19 @@
     "express": "^4.17.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.11.0",
     "@babel/plugin-transform-modules-commonjs": "^7.10.4",
-    "clean-webpack-plugin": "^2.0.0",
+    "@babel/preset-env": "^7.11.0",
+    "@vaadin/router": "^1.7.2",
+    "babel-loader": "^8.1.0",
+    "babel-plugin-template-html-minifier": "^4.1.0",
     "css-loader": "^4.2.0",
     "file-loader": "^6.0.0",
     "html-loader": "^1.1.0",
     "html-webpack-plugin": "^4.3.0",
-    "jest": "",
+    "jest": "^26.2.2",
     "lit-element": "^2.3.1",
-    "mini-css-extract-plugin": "^0.9.0",
     "nanoid": "^3.1.12",
     "node-sass": "^4.14.1",
     "nodemon": "^2.0.4",
@@ -26,10 +30,10 @@
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.12",
     "webpack-dev-server": "^3.11.0",
-    "webpack-merge": "^4.2.1"
+    "webpack-merge": "^5.1.1"
   },
   "scripts": {
-    "start": "webpack-dev-server  --config webpack.dev.js --open",
+    "start": "webpack-dev-server --config webpack.dev.js --history-api-fallback --open",
     "build": "webpack --config webpack.prod.js",
     "test": "jest",
     "node": "node server.js"

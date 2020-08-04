@@ -10,40 +10,38 @@
     <title>Roster Builder</title>
   </head>
   <body>
-    <nav>
+    <nav id="mainNav">
       <div class="logo">
         <img src="./svg/logo.svg" alt="RosterBuilder logo" />
       </div>
       <ul>
         <li>
-          <button class="button">
+          <a class="button" href="/employees" id="employees">
             <img src="./svg/face.svg" alt="Employee icon" />
             <p>Employees</p>
-          </button>
+          </a>
         </li>
         <li>
-          <button class="button">
+          <a class="button">
             <img src="./svg/work_outline.svg" alt="Case icon" />
             <p>Shifts</p>
-          </button>
+          </a>
         </li>
         <li>
-          <button class="button">
+          <a class="button">
             <img src="./svg/settings.svg" alt="Settings icon" />
             <p>Settings</p>
-          </button>
+          </a>
         </li>
         <li>
-          <button class="button">
+          <a class="button" href="/" id="schedule">
             <img src="./svg/schedule.svg" alt="Schedule icon" />
             <p>Create</p>
-          </button>
+          </a>
         </li>
       </ul>
     </nav>
 
-    <main>
-      <employees-view></employees-view>
-    </main>
+    <main></main>
   </body>
 </html>
