@@ -55,70 +55,72 @@ class shiftSchedule extends LitElement {
 
   render() {
     return html`
-      <table>
-        <col span="1" class="fixedWidth" />
-        <thead>
-          <tr>
-            <th></th>
-            ${this.scheduleToDisplay[0].assignedShifts.map(
-              (item, index) => html`<th>${index}</th>`
-            )}
-            <th>WH</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${this.scheduleToDisplay.map((item, index) => {
-            return html`
-              <tr>
-                <th class="employeeNames">${item.information.name}</th>
-                ${scheduleConverter(item.assignedShifts).map((assigned) => {
-                  return html`
-                    <td colspan=${assigned.count} class="${assigned.value}">
-                      ${assigned.value !== " "
-                        ? assigned.value + " " + assigned.count
-                        : ""}
-                    </td>
-                  `;
-                })}
-                <td>
-                  ${item.schedulingInformation.hoursWorked}
-                </td>
-              </tr>
-            `;
-          })}
-        </tbody>
-      </table>
+      <div class="wrapper">
+        <table>
+          <col span="1" class="fixedWidth" />
+          <thead>
+            <tr>
+              <th></th>
+              ${this.scheduleToDisplay[0].assignedShifts.map(
+                (item, index) => html`<th>${index}</th>`
+              )}
+              <th>WH</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${this.scheduleToDisplay.map((item, index) => {
+              return html`
+                <tr>
+                  <th class="employeeNames">${item.information.name}</th>
+                  ${scheduleConverter(item.assignedShifts).map((assigned) => {
+                    return html`
+                      <td colspan=${assigned.count} class="${assigned.value}">
+                        ${assigned.value !== " "
+                          ? assigned.value + " " + assigned.count
+                          : ""}
+                      </td>
+                    `;
+                  })}
+                  <td>
+                    ${item.schedulingInformation.hoursWorked}
+                  </td>
+                </tr>
+              `;
+            })}
+          </tbody>
+        </table>
 
-      <table>
-        <tbody>
-          <tr>
-            <td>Quality consecutive days off</td>
-            <td>
-              ${Math.round(
-                this.scheduleToDisplay[0].quality.minConsecutiveDaysOffCheck *
-                  1000
-              ) / 1000}
-            </td>
-          </tr>
-          <tr>
-            <td>Shift distribution</td>
-            <td>
-              ${Math.round(
-                this.scheduleToDisplay[0].quality.shiftDistribution * 1000
-              ) / 1000}
-            </td>
-          </tr>
-          <tr>
-            <td>Squared total hour difference</td>
-            <td>
-              ${Math.round(
-                this.scheduleToDisplay[0].quality.totalHourDifference * 1000
-              ) / 1000}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <button @click="${this.btnCreateSchedule}">Create new roster</button>
+        <table>
+          <tbody>
+            <tr>
+              <td>Quality consecutive days off</td>
+              <td>
+                ${Math.round(
+                  this.scheduleToDisplay[0].quality.minConsecutiveDaysOffCheck *
+                    1000
+                ) / 1000}
+              </td>
+            </tr>
+            <tr>
+              <td>Shift distribution</td>
+              <td>
+                ${Math.round(
+                  this.scheduleToDisplay[0].quality.shiftDistribution * 1000
+                ) / 1000}
+              </td>
+            </tr>
+            <tr>
+              <td>Squared total hour difference</td>
+              <td>
+                ${Math.round(
+                  this.scheduleToDisplay[0].quality.totalHourDifference * 1000
+                ) / 1000}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <button @click="${this.btnCreateSchedule}">Create new roster</button>
+      </div>
     `;
   }
 
@@ -129,11 +131,19 @@ class shiftSchedule extends LitElement {
         font-family: "Poppins", sans-serif;
       }
 
+      .wrapper {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        align-items: flex-start;
+        justify-content: center;
+      }
+
       table {
         margin: 5px;
         border: 1px solid darkgrey;
         border-collapse: collapse;
-        background-color: rgb(20, 20, 20);
+        background-color: white;
         table-layout: fixed;
         overflow: hidden;
         width: 99%;
@@ -160,13 +170,13 @@ class shiftSchedule extends LitElement {
       }
 
       table .D {
-        background-color: var(--green-sheen);
+        background-color: green;
         color: black;
         border-radius: 4px;
       }
 
       table .N {
-        background-color: var(--fire-opal);
+        background-color: red;
         color: white;
         border-radius: 4px;
       }
@@ -188,13 +198,13 @@ class shiftSchedule extends LitElement {
         padding: 10px;
         background-color: black;
         color: rgb(210, 210, 210);
-        border: 1px solid var(--celadon-blue);
+        border: 1px solid blue;
         transition: background-color 0.3s ease-out, color 0.3s ease-out;
       }
 
       button:hover {
         cursor: pointer;
-        background-color: var(--celadon-blue);
+        background-color: blue;
         color: white;
       }
     `;

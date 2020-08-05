@@ -3,14 +3,9 @@ import { LitElement, html, css } from "lit-element";
 class EmployeeCard extends LitElement {
   static get properties() {
     return {
-      id: { type: String },
-      name: { type: String },
-      avatar: { type: String },
+      employee: { type: Object },
+      editEmployee: { type: Boolean }, // This is just added to trigger updates after changes
     };
-  }
-
-  constructor() {
-    super();
   }
 
   // Template for custom events
@@ -18,28 +13,30 @@ class EmployeeCard extends LitElement {
     this.dispatchEvent(
       new CustomEvent("remove-me", {
         detail: {
-          id: this.id,
+          id: this.employee.id,
         },
       })
     );
-    event.stopPropagation(); // This line is needed to prevent that the edit event gets also triggered by clicking the div.
+    // This line is needed to prevent that the edit event gets also triggered by clicking the div.
+    event.stopPropagation();
   }
 
   editThisEmployee() {
     this.dispatchEvent(
       new CustomEvent("edit-me", {
         detail: {
-          id: this.id,
+          id: this.employee.id,
         },
       })
     );
+    this.requestUpdate();
   }
 
   render() {
     return html`
       <div class="card" @click=${this.editThisEmployee}>
-        <img src="${this.avatar}" />
-        ${this.name}
+        <img src="${this.employee.avatar}" />
+        ${this.employee.name}
         <button @click=${this.removeThisEmployee}>Remove</button>
       </div>
     `;

@@ -24,6 +24,22 @@ function initRouter() {
       },
     },
     {
+      path: "/shifts",
+      component: "shifts-view",
+      action: () => {
+        import("../views/shifts-view");
+        activeMenuItem("shifts");
+      },
+    },
+    {
+      path: "/settings",
+      component: "settings-view",
+      action: () => {
+        import("../views/settings-view");
+        activeMenuItem("settings");
+      },
+    },
+    {
       path: "(.*)",
       component: "not-found-view",
       action: () => {

@@ -1,11 +1,11 @@
 import { LitElement, html, css } from "lit-element";
+import { nanoid } from "nanoid";
+import { randomAvataaarURL } from "../src/randomAvataaarURL";
 
 class EditEmployee extends LitElement {
   static get properties() {
     return {
-      id: { type: String },
-      name: { type: String },
-      avatar: { type: String },
+      employee: { type: Object },
     };
   }
 
@@ -20,28 +20,52 @@ class EditEmployee extends LitElement {
   saveChanges(event) {
     event.preventDefault();
 
+    // Update the properties of this class
+    this.employee.name = this.shadowRoot.getElementById("name").value;
+    this.employee.plannedWorkingTime = this.shadowRoot.getElementById(
+      "plannedWorkingTime"
+    ).value;
+
+    // Dispatch event with this employee object to save it to the database or local storage
     this.dispatchEvent(
       new CustomEvent("update-me", {
         detail: {
-          id: this.id,
-          name: this.shadowRoot.getElementById("name").value,
-          avatar: this.avatar,
+          employee: this.employee,
         },
       })
     );
+  }
+
+  randomImage() {
+    this.employee.avatar = randomAvataaarURL(nanoid(10));
+    this.requestUpdate();
   }
 
   render() {
     return html`
       <div class="greyout">
         <div class="edit">
-          <img src="${this.avatar}" />
+          <img src="${this.employee.avatar}" @click="${this.randomImage}" />
           <button @click="${this.sendCloseEvent}">X</button>
           <form>
             <div class="inputGroup">
               <label
                 >Name:
-                <input type="text" id="name" value="${this.name}" isRequired />
+                <input
+                  type="text"
+                  id="name"
+                  value="${this.employee.name}"
+                  isRequired
+                />
+              </label>
+              <label
+                >Planned working time:
+                <input
+                  type="number"
+                  id="plannedWorkingTime"
+                  value="${this.employee.plannedWorkingTime}"
+                  isRequired
+                />
               </label>
             </div>
             <button type="submit" @click="${this.saveChanges}">Save</button>

@@ -2,6 +2,7 @@ import { LitElement, html, css } from "lit-element";
 import "../components/employee-card.js";
 import "../components/edit-employee.js";
 import { nanoid } from "nanoid";
+import { randomAvataaarURL } from "../src/randomAvataaarURL";
 
 class EmployeesView extends LitElement {
   static get properties() {
@@ -14,6 +15,7 @@ class EmployeesView extends LitElement {
 
   constructor() {
     super();
+
     this.editEmployee = false;
     if (window.localStorage.getItem("definedEmployees") === "null") {
       this.employees = [];
@@ -39,7 +41,8 @@ class EmployeesView extends LitElement {
       {
         id: newId,
         name: "New Employee",
-        avatar: `https://avatars.dicebear.com/api/avataaars/${newId}.svg?options[style]=circle`,
+        plannedWorkingTime: 180,
+        avatar: randomAvataaarURL(newId),
       },
     ];
     this.openEditEmployee({ detail: { id: newId } });
@@ -64,9 +67,8 @@ class EmployeesView extends LitElement {
 
   updateEmployee(event) {
     for (let i = 0; i < this.employees.length; i++) {
-      if (this.employees[i].id === event.detail.id) {
-        this.employees[i] = event.detail;
-        break;
+      if (this.employees[i].id === event.detail.employee.id) {
+        this.employees[i] = event.detail.employee;
       }
     }
     this.editEmployee = false;
@@ -76,9 +78,7 @@ class EmployeesView extends LitElement {
     return html`
       ${this.editEmployee
         ? html`<edit-employee
-            id="${this.editEmployeeObject.id}"
-            name="${this.editEmployeeObject.name}"
-            avatar="${this.editEmployeeObject.avatar}"
+            .employee="${this.editEmployeeObject}"
             @close-me="${this.closeEditEmployee}"
             @update-me="${this.updateEmployee}"
           ></edit-employee>`
@@ -87,9 +87,8 @@ class EmployeesView extends LitElement {
         ${this.employees.map(
           (employee) =>
             html`<employee-card
-              id="${employee.id}"
-              name="${employee.name}"
-              avatar="${employee.avatar}"
+              ?editEmployee="${this.editEmployee}"
+              .employee="${employee}"
               @remove-me="${this.removeEmployee}"
               @edit-me="${this.openEditEmployee}"
             ></employee-card>`
