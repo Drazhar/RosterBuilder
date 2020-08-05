@@ -42,6 +42,16 @@ class EmployeesView extends LitElement {
         id: newId,
         name: "New Employee",
         plannedWorkingTime: 180,
+        overtime: 0,
+        consecutiveWorkingDays: {
+          min: 3,
+          max: 5,
+          prefered: 4,
+        },
+        minConsecutiveDaysOff: 2,
+        shift: {
+          distribution: [0, 1, 1, 1],
+        },
         avatar: randomAvataaarURL(newId),
       },
     ];

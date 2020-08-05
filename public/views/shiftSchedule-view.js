@@ -38,7 +38,8 @@ class shiftSchedule extends LitElement {
 
   async createSchedule() {
     const data = {
-      iterations: 10000,
+      iterations: 1000,
+      employees: JSON.parse(window.localStorage.getItem("definedEmployees")),
     };
     const response = await fetch(
       // `${window.location.origin}/api/createSchedule`,

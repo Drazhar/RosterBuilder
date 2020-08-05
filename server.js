@@ -26,9 +26,7 @@ app.get("/", (req, res) => res.sendFile("index.html"));
 // APIs
 app.post("/api/createSchedule", (req, res) => {
   const myWorker = new Worker("./src/worker/scheduler.js", {
-    workerData: {
-      iterations: req.body.iterations,
-    },
+    workerData: req.body,
   });
   myWorker.on("message", (result) =>
     res.json({
