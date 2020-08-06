@@ -153,7 +153,7 @@ class shiftSchedule extends LitElement {
       td,
       th {
         border: 1px solid rgb(60, 60, 60);
-        padding: 2px 6px 2px 6px;
+        padding: 1px;
         text-align: center;
         justify-content: center;
         width: 1fr;

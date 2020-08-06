@@ -17,7 +17,7 @@ class EmployeesView extends LitElement {
     super();
 
     this.editEmployee = false;
-    if (window.localStorage.getItem("definedEmployees") === "null") {
+    if (window.localStorage.getItem("definedEmployees") === null) {
       this.employees = [];
     } else {
       this.employees = JSON.parse(
@@ -26,7 +26,7 @@ class EmployeesView extends LitElement {
     }
   }
 
-  updated(changedProperties) {
+  updated() {
     window.localStorage.setItem(
       "definedEmployees",
       JSON.stringify(this.employees)
