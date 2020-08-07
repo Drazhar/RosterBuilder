@@ -41,7 +41,7 @@ class ShiftsView extends LitElement {
         requiredEmployees: 1,
       },
     ];
-    //this.openEditShift({ detail: { id: newId } });
+    this.openEditShift({ detail: { id: newId } });
   }
 
   openEditShift(event) {

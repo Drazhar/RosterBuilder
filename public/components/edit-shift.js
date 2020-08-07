@@ -38,12 +38,39 @@ class EditShift extends LitElement {
           <button @click="${this.sendCloseEvent}">X</button>
           <form>
             <div class="inputGroup">
+              <label>
+                Color:
+                <input
+                  type="color"
+                  class="colorInput"
+                  id="color"
+                  value="#${this.shift.colors.backgroundColor}"
+                />
+              </label>
               <label
                 >Name:
                 <input
                   type="text"
                   id="name"
                   value="${this.shift.name}"
+                  isRequired
+                />
+              </label>
+              <label
+                >Working hours:
+                <input
+                  type="number"
+                  id="hours"
+                  value="${this.shift.workingHours}"
+                  isRequired
+                />
+              </label>
+              <label
+                >Required employees:
+                <input
+                  type="number"
+                  id="requiredEmployees"
+                  value="${this.shift.requiredEmployees}"
                   isRequired
                 />
               </label>
@@ -57,8 +84,9 @@ class EditShift extends LitElement {
 
   static get styles() {
     return css`
-      img {
-        width: 90px;
+      .colorButton {
+        width: 2em;
+        height: 2em;
       }
 
       .greyout {
