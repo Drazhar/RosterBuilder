@@ -5,6 +5,13 @@ module.exports = function runScheduler(
   employeeInformation = employeeInformationTemp,
   shiftInformation = shiftInformationTemp
 ) {
+  shiftInformation.unshift({
+    id: " ",
+    name: " ",
+    workingHours: 0,
+    autoAssign: true,
+  });
+
   let createdSchedules = []; // This array will store all informations for the employees and the shift assignments created. It will get huge.
   let qualityRatings = [];
   const numberOfDays = 45; // This should be set outside of the function later.
@@ -91,7 +98,7 @@ module.exports = function runScheduler(
   createdSchedules[bestIndex].forEach((employee, i) => {
     employee.assignedShifts.forEach((shift, j) => {
       createdSchedules[bestIndex][i].assignedShifts[j] =
-        shiftInformation[shift].name;
+        shiftInformation[shift].id;
     });
   });
   createdSchedules[bestIndex][0].quality = qualityRatings[bestIndex];
@@ -250,7 +257,8 @@ function obtainInformation(inputSchedule, shiftInformation) {
     // Distribute shifts
     for (
       let i = 1;
-      i < employee.schedulingInformation.shift.plannedDistribution.length;
+      i < shiftInformation.length - 1;
+      //i < employee.schedulingInformation.shift.plannedDistribution.length;
       i++
     ) {
       if (employee.schedulingInformation.shift.plannedDistribution[i] === 0) {
@@ -293,7 +301,7 @@ function obtainInformation(inputSchedule, shiftInformation) {
 
 function sumAutoAssignDistribution(shiftDistribution, shiftInformation) {
   let sum = 0;
-  for (let i = 1; i < shiftDistribution.length; i++) {
+  for (let i = 1; i < shiftInformation.length; i++) {
     if (shiftInformation[i].autoAssign) {
       sum += shiftDistribution[i];
     }

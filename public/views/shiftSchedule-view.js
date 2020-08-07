@@ -5,6 +5,7 @@ class shiftSchedule extends LitElement {
   static get properties() {
     return {
       scheduleToDisplay: { type: Array },
+      shifts: { type: Array },
     };
   }
 
@@ -23,6 +24,12 @@ class shiftSchedule extends LitElement {
         },
       ];
     }
+
+    if (window.localStorage.getItem("definedShifts") === null) {
+      this.shifts = [];
+    } else {
+      this.shifts = JSON.parse(window.localStorage.getItem("definedShifts"));
+    }
   }
 
   async btnCreateSchedule() {
@@ -38,8 +45,9 @@ class shiftSchedule extends LitElement {
 
   async createSchedule() {
     const data = {
-      iterations: 10000,
+      iterations: 1000,
       employees: JSON.parse(window.localStorage.getItem("definedEmployees")),
+      shifts: this.shifts,
     };
     const response = await fetch(
       // `${window.location.origin}/api/createSchedule`,
@@ -75,9 +83,26 @@ class shiftSchedule extends LitElement {
                   <th class="employeeNames">${item.information.name}</th>
                   ${scheduleConverter(item.assignedShifts).map((assigned) => {
                     return html`
-                      <td colspan=${assigned.count} class="${assigned.value}">
+                      <td
+                        colspan=${assigned.count}
+                        style="${assigned.value !== " "
+                          ? `background-color:#${
+                              this.shifts.filter(
+                                (item) => item.id === assigned.value
+                              )[0].colors.backgroundColor
+                            }; color:#${
+                              this.shifts.filter(
+                                (item) => item.id === assigned.value
+                              )[0].colors.textColor
+                            }`
+                          : ""}"
+                      >
                         ${assigned.value !== " "
-                          ? assigned.value + " " + assigned.count
+                          ? this.shifts.filter(
+                              (item) => item.id === assigned.value
+                            )[0].name +
+                            " " +
+                            assigned.count
                           : ""}
                       </td>
                     `;
@@ -157,6 +182,14 @@ class shiftSchedule extends LitElement {
         text-align: center;
         justify-content: center;
         width: 1fr;
+        border-radius: 4px;
+        opacity: 0.85;
+      }
+
+      td:hover {
+        transition: all 0.4s ease-out;
+        opacity: 1;
+        cursor: pointer;
       }
 
       .fixedWidth {
@@ -168,30 +201,6 @@ class shiftSchedule extends LitElement {
         padding: 6px;
         letter-spacing: 1px;
         text-align: left;
-      }
-
-      table .D {
-        background-color: green;
-        color: black;
-        border-radius: 4px;
-      }
-
-      table .N {
-        background-color: red;
-        color: white;
-        border-radius: 4px;
-      }
-
-      .D,
-      .N {
-        opacity: 0.85;
-      }
-
-      .D:hover,
-      .N:hover {
-        transition: all 0.4s ease-out;
-        opacity: 1;
-        cursor: pointer;
       }
 
       button {

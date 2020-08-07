@@ -29,7 +29,7 @@ class ShiftsView extends LitElement {
   }
 
   addNewShift() {
-    const newId = nanoid(8);
+    const newId = nanoid(6);
     this.shifts = [
       ...this.shifts,
       {
