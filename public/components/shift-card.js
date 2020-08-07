@@ -53,11 +53,6 @@ class ShiftCard extends LitElement {
               <td>Employees</td>
               <td>${this.shift.requiredEmployees}</td>
             </tr>
-
-            <tr>
-              <td>Assign</td>
-              <td>${this.shift.autoAssign ? "Auto" : "manual"}</td>
-            </tr>
           </tbody>
         </table>
         <button @click=${this.removeThisShift}>Remove</button>

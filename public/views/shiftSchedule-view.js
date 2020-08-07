@@ -171,7 +171,6 @@ class shiftSchedule extends LitElement {
 
       table {
         margin: 5px;
-        border: 1px solid darkgrey;
         border-collapse: collapse;
         background-color: white;
         table-layout: fixed;
@@ -181,8 +180,8 @@ class shiftSchedule extends LitElement {
 
       td,
       th {
-        border: 1px solid rgb(60, 60, 60);
         padding: 1px;
+        border: 1px solid rgb(180, 180, 180);
         text-align: center;
         justify-content: center;
         width: 1fr;
