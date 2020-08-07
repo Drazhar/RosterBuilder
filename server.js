@@ -25,10 +25,6 @@ app.get("/", (req, res) => res.sendFile("index.html"));
 
 // APIs
 app.post("/api/createSchedule", (req, res) => {
-  // Run without workers for debugging
-  // const runScheduler = require("./src/scheduler/main");
-  // runScheduler(req.body.iterations, req.body.employees, req.body.shifts);
-
   // Deploy workers
   const myWorker = new Worker("./src/worker/scheduler.js", {
     workerData: req.body,

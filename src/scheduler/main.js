@@ -5,6 +5,19 @@ module.exports = function runScheduler(
   employeeInformation = employeeInformationTemp,
   shiftInformation = shiftInformationTemp
 ) {
+  // Convert numbers
+  for (let i = 0; i < shiftInformation.length; i++) {
+    shiftInformation[i].workingHours = parseInt(
+      shiftInformation[i].workingHours,
+      10
+    );
+    shiftInformation[i].requiredEmployees = parseInt(
+      shiftInformation[i].requiredEmployees,
+      10
+    );
+  }
+
+  // Add the shift at the first place for a non working day.
   shiftInformation.unshift({
     id: " ",
     name: " ",
@@ -14,7 +27,7 @@ module.exports = function runScheduler(
 
   let createdSchedules = []; // This array will store all informations for the employees and the shift assignments created. It will get huge.
   let qualityRatings = [];
-  const numberOfDays = 45; // This should be set outside of the function later.
+  const numberOfDays = 30; // This should be set outside of the function later.
 
   let minTotalHourDifference = Infinity;
 
@@ -90,10 +103,6 @@ module.exports = function runScheduler(
     }
   });
 
-  // console.log(createdSchedules[bestIndex]);
-  // console.log(qualityRatings[bestIndex]);
-  // console.log(bestSchedules);
-
   // Replace numbers with names for better overview
   createdSchedules[bestIndex].forEach((employee, i) => {
     employee.assignedShifts.forEach((shift, j) => {
@@ -101,6 +110,7 @@ module.exports = function runScheduler(
         shiftInformation[shift].id;
     });
   });
+
   createdSchedules[bestIndex][0].quality = qualityRatings[bestIndex];
   return createdSchedules[bestIndex];
 };

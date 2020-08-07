@@ -45,7 +45,7 @@ class shiftSchedule extends LitElement {
 
   async createSchedule() {
     const data = {
-      iterations: 1000,
+      iterations: 10000,
       employees: JSON.parse(window.localStorage.getItem("definedEmployees")),
       shifts: this.shifts,
     };
@@ -85,7 +85,9 @@ class shiftSchedule extends LitElement {
                     return html`
                       <td
                         colspan=${assigned.count}
-                        style="${assigned.value !== " "
+                        style="${this.shifts.filter(
+                          (item) => item.id === assigned.value
+                        ).length > 0
                           ? `background-color:#${
                               this.shifts.filter(
                                 (item) => item.id === assigned.value
@@ -97,7 +99,9 @@ class shiftSchedule extends LitElement {
                             }`
                           : ""}"
                       >
-                        ${assigned.value !== " "
+                        ${this.shifts.filter(
+                          (item) => item.id === assigned.value
+                        ).length > 0
                           ? this.shifts.filter(
                               (item) => item.id === assigned.value
                             )[0].name +
@@ -189,7 +193,7 @@ class shiftSchedule extends LitElement {
       td:hover {
         transition: all 0.4s ease-out;
         opacity: 1;
-        cursor: pointer;
+        /* cursor: pointer; */
       }
 
       .fixedWidth {

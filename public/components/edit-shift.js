@@ -1,4 +1,5 @@
 import { LitElement, html, css } from "lit-element";
+import { autoTextColor } from "../src/autoColorPicker";
 
 class EditShift extends LitElement {
   static get properties() {
@@ -19,7 +20,18 @@ class EditShift extends LitElement {
     event.preventDefault();
 
     // Update the properties of this class
+    this.shift.colors.backgroundColor = this.shadowRoot
+      .getElementById("color")
+      .value.toString()
+      .substr(1);
+    this.shift.colors.textColor = autoTextColor(
+      this.shift.colors.backgroundColor
+    );
     this.shift.name = this.shadowRoot.getElementById("name").value;
+    this.shift.workingHours = this.shadowRoot.getElementById("hours").value;
+    this.shift.requiredEmployees = this.shadowRoot.getElementById(
+      "requiredEmployees"
+    ).value;
 
     // Dispatch event with this employee object to save it to the database or local storage
     this.dispatchEvent(
