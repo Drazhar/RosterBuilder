@@ -37,7 +37,8 @@ class ShiftCard extends LitElement {
       <div
         class="card"
         @click=${this.editThisShift}
-        style="background-color:#${this.shift.color}"
+        style="background-color:#${this.shift.colors
+          .backgroundColor}; color:#${this.shift.colors.textColor}"
       >
         ${this.shift.name}
         <button @click=${this.removeThisShift}>Remove</button>

@@ -35,7 +35,7 @@ class ShiftsView extends LitElement {
       {
         id: newId,
         name: "New Shift",
-        color: autoColor(this.shifts),
+        colors: autoColor(this.shifts),
         workingHours: 12,
         autoAssign: true,
         requiredEmployees: 1,
