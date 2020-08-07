@@ -40,7 +40,26 @@ class ShiftCard extends LitElement {
         style="background-color:#${this.shift.colors
           .backgroundColor}; color:#${this.shift.colors.textColor}"
       >
-        ${this.shift.name}
+        <h1>${this.shift.name}</h1>
+
+        <table>
+          <tbody>
+            <tr>
+              <td>Hours</td>
+              <td>${this.shift.workingHours}</td>
+            </tr>
+
+            <tr>
+              <td>Employees</td>
+              <td>${this.shift.requiredEmployees}</td>
+            </tr>
+
+            <tr>
+              <td>Assign</td>
+              <td>${this.shift.autoAssign ? "Auto" : "manual"}</td>
+            </tr>
+          </tbody>
+        </table>
         <button @click=${this.removeThisShift}>Remove</button>
       </div>
     `;
@@ -48,6 +67,15 @@ class ShiftCard extends LitElement {
 
   static get styles() {
     return css`
+      h1 {
+        font-size: 1.2em;
+      }
+
+      table {
+        width: 90%;
+        font-size: 1em;
+      }
+
       .card {
         display: flex;
         flex-direction: column;
