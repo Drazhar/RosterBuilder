@@ -40,6 +40,7 @@ class ShiftCard extends LitElement {
         style="background-color:#${this.shift.colors
           .backgroundColor}; color:#${this.shift.colors.textColor}"
       >
+        <button @click=${this.removeThisShift}>X</button>
         <h1>${this.shift.name}</h1>
 
         <table>
@@ -55,7 +56,6 @@ class ShiftCard extends LitElement {
             </tr>
           </tbody>
         </table>
-        <button @click=${this.removeThisShift}>Remove</button>
       </div>
     `;
   }
@@ -95,6 +95,25 @@ class ShiftCard extends LitElement {
       .card img {
         width: 90px;
         margin-bottom: 8px;
+      }
+
+      button {
+        visibility: hidden;
+        position: absolute;
+        border-radius: 10px;
+        width: 30px;
+        height: 30px;
+        right: 0;
+        top: 0;
+        border: 1px solid rgb(57, 62, 70);
+      }
+
+      button:hover {
+        cursor: pointer;
+      }
+
+      .card:hover button {
+        visibility: visible;
       }
     `;
   }

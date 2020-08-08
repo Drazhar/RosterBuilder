@@ -5,6 +5,7 @@ class EditShift extends LitElement {
   static get properties() {
     return {
       shift: { type: Object },
+      posLeft: { type: Number },
     };
   }
 
@@ -46,19 +47,17 @@ class EditShift extends LitElement {
   render() {
     return html`
       <div class="greyout">
-        <div class="edit">
-          <button @click="${this.sendCloseEvent}">X</button>
+        <div class="edit" style="left: ${this.posLeft}px">
+          <button @click="${this.sendCloseEvent}" class="x-button">X</button>
           <form>
-            <div class="inputGroup">
-              <label>
-                Color:
-                <input
-                  type="color"
-                  class="colorInput"
-                  id="color"
-                  value="#${this.shift.colors.backgroundColor}"
-                />
-              </label>
+            <input
+              type="color"
+              class="colorInput"
+              id="color"
+              value="#${this.shift.colors.backgroundColor}"
+            />
+            <fieldset>
+              <legend>General</legend>
               <label
                 >Name:
                 <input
@@ -86,8 +85,14 @@ class EditShift extends LitElement {
                   isRequired
                 />
               </label>
-            </div>
-            <button type="submit" @click="${this.saveChanges}">Save</button>
+            </fieldset>
+            <button
+              type="submit"
+              @click="${this.saveChanges}"
+              style="margin-bottom: 0.2vmax"
+            >
+              Save
+            </button>
           </form>
         </div>
       </div>
@@ -113,31 +118,71 @@ class EditShift extends LitElement {
       .edit {
         position: fixed;
         top: 10%;
-        right: 10%;
-        bottom: 10%;
-        left: 10%;
         z-index: 4;
+        width: 300px;
         background-color: white;
         box-shadow: 2px 2px 8px rgb(57, 62, 70, 0.9);
         border-radius: 20px;
-        animation-duration: 0.2s;
-        animation-name: popup;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
       }
 
-      @keyframes popup {
-        from {
-          top: 50%;
-          right: 50%;
-          bottom: 50%;
-          left: 50%;
-        }
+      #color {
+        width: 80%;
+        height: 80px;
+        border: none;
+      }
 
-        to {
-          top: 10%;
-          right: 10%;
-          bottom: 10%;
-          left: 10%;
-        }
+      #color:hover {
+        cursor: pointer;
+      }
+
+      .x-button {
+        position: absolute;
+        border-radius: 10px;
+        width: 30px;
+        height: 30px;
+        right: 0;
+        border: 1px solid rgb(57, 62, 70);
+      }
+
+      .x-button:hover {
+        cursor: pointer;
+      }
+
+      form {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        width: 90%;
+      }
+
+      fieldset {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 90%;
+        border: 1px solid rgba(57, 62, 70, 0.4);
+        margin: 0.2vmax;
+        font-size: 0.9em;
+      }
+
+      legend {
+        color: rgba(57, 62, 70, 0.6);
+        font-size: 0.8em;
+      }
+
+      label {
+        width: 100%;
+        display: flex;
+        padding: 0.3vh 0;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+
+      input {
+        width: 80px;
       }
     `;
   }

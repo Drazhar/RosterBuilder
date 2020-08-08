@@ -248,10 +248,6 @@ class EditEmployee extends LitElement {
         justify-content: space-between;
       }
 
-      #plannedWorkingTime::after {
-        content: "h";
-      }
-
       input {
         width: 80px;
       }

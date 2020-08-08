@@ -10,6 +10,7 @@ class ShiftsView extends LitElement {
       shifts: { type: Array },
       editShift: { type: Boolean },
       editShiftObject: { type: Object },
+      editPosLeft: { type: Number },
     };
   }
 
@@ -45,6 +46,19 @@ class ShiftsView extends LitElement {
   }
 
   openEditShift(event) {
+    if (event.path !== undefined) {
+      const targetPositionLeft = event.path[0].offsetLeft - 150 + 80;
+      if (targetPositionLeft < 10) {
+        this.editPosLeft = 10;
+      } else if (targetPositionLeft + 300 > window.innerWidth) {
+        this.editPosLeft = window.innerWidth - 300 - 30;
+      } else {
+        this.editPosLeft = targetPositionLeft;
+      }
+    } else {
+      this.editPosLeft = window.innerWidth / 2 - 175;
+    }
+
     this.editShiftObject = this.shifts.filter(
       (item) => item.id === event.detail.id
     )[0];
@@ -74,6 +88,7 @@ class ShiftsView extends LitElement {
     return html`
       ${this.editShift
         ? html`<edit-shift
+            posLeft="${this.editPosLeft}"
             .shift="${this.editShiftObject}"
             @close-me="${this.closeEditShift}"
             @update-me="${this.updateShift}"
