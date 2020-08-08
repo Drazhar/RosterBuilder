@@ -1,21 +1,13 @@
 const { employeeInformationTemp, shiftInformationTemp } = require("./input");
+const input = require("./input");
 
 module.exports = function runScheduler(
   iterations = 1,
   employeeInformation = employeeInformationTemp,
   shiftInformation = shiftInformationTemp
 ) {
-  // Convert numbers
-  for (let i = 0; i < shiftInformation.length; i++) {
-    shiftInformation[i].workingHours = parseInt(
-      shiftInformation[i].workingHours,
-      10
-    );
-    shiftInformation[i].requiredEmployees = parseInt(
-      shiftInformation[i].requiredEmployees,
-      10
-    );
-  }
+  convertToNumbersShiftsObject(shiftInformation); // Converts all strings to numbers which should be numbers
+  convertToNumbersEmployeeObject(employeeInformation); // Converts all strings to numbers
 
   // Add the shift at the first place for a non working day.
   shiftInformation.unshift({
@@ -371,6 +363,7 @@ function initializeSchedule(employeeInformation) {
   // Initialized a schedule with the employee informations.
   let initializedSchedule = [];
   employeeInformation.forEach((employee) => {
+    const parsedShiftInfo = parseShiftObject(employee);
     initializedSchedule.push({
       information: {
         id: employee.id,
@@ -391,12 +384,71 @@ function initializeSchedule(employeeInformation) {
           numberOfDays: 5,
         },
         shift: {
-          plannedDistribution: employee.shift.distribution,
-          worked: new Array(employee.shift.distribution.length).fill(0),
+          plannedDistribution: parsedShiftInfo.plannedDistribution,
+          map: parsedShiftInfo.map,
+          worked: parsedShiftInfo.workedDistribution,
         },
       },
       assignedShifts: [],
     });
   });
   return initializedSchedule;
+}
+
+function parseShiftObject(shiftDist) {
+  let plannedDistribution = [];
+  let workedDistribution = [];
+  let map = [];
+
+  // Fill for day off shift
+  plannedDistribution.push(0);
+  workedDistribution.push(0);
+  map.push(" ");
+
+  for (const shift in shiftDist.shift) {
+    plannedDistribution.push(shiftDist.shift[shift]);
+    workedDistribution.push(0);
+    map.push(shift);
+  }
+  return { plannedDistribution, workedDistribution, map };
+}
+
+function convertToNumbersShiftsObject(shiftInformation) {
+  // Convert numbers
+  for (let i = 0; i < shiftInformation.length; i++) {
+    shiftInformation[i].workingHours = parseInt(
+      shiftInformation[i].workingHours,
+      10
+    );
+    shiftInformation[i].requiredEmployees = parseInt(
+      shiftInformation[i].requiredEmployees,
+      10
+    );
+  }
+}
+
+function convertToNumbersEmployeeObject(employeeInformation) {
+  employeeInformation.forEach((employee) => {
+    employee.plannedWorkingTime = parseInt(employee.plannedWorkingTime, 10);
+    employee.overtime = parseInt(employee.overtime, 10);
+    employee.minConsecutiveDaysOff = parseInt(
+      employee.minConsecutiveDaysOff,
+      10
+    );
+    employee.consecutiveWorkingDays.min = parseInt(
+      employee.consecutiveWorkingDays.min,
+      10
+    );
+    employee.consecutiveWorkingDays.prefered = parseInt(
+      employee.consecutiveWorkingDays.prefered,
+      10
+    );
+    employee.consecutiveWorkingDays.max = parseInt(
+      employee.consecutiveWorkingDays.max,
+      10
+    );
+    for (const shift in employee.shift) {
+      employee.shift[shift] = parseInt(employee.shift[shift], 10);
+    }
+  });
 }
