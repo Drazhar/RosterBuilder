@@ -3,6 +3,7 @@ import "../components/employee-card.js";
 import "../components/edit-employee.js";
 import { nanoid } from "nanoid";
 import { randomAvataaarURL } from "../src/randomAvataaarURL";
+import { setDefaultShiftDist } from "../src/defaultShiftDist";
 
 class EmployeesView extends LitElement {
   static get properties() {
@@ -10,6 +11,8 @@ class EmployeesView extends LitElement {
       employees: { type: Array },
       editEmployee: { type: Boolean },
       editEmployeeObject: { type: Object },
+      editPosLeft: { type: Number },
+      shifts: { type: Array },
     };
   }
 
@@ -23,6 +26,12 @@ class EmployeesView extends LitElement {
       this.employees = JSON.parse(
         window.localStorage.getItem("definedEmployees")
       );
+    }
+
+    if (window.localStorage.getItem("definedShifts") === null) {
+      this.shifts = [];
+    } else {
+      this.shifts = JSON.parse(window.localStorage.getItem("definedShifts"));
     }
   }
 
@@ -49,16 +58,28 @@ class EmployeesView extends LitElement {
           prefered: 4,
         },
         minConsecutiveDaysOff: 2,
-        shift: {
-          distribution: [0, 1, 1, 1],
-        },
+        shift: setDefaultShiftDist(this.shifts),
         avatar: randomAvataaarURL(newId),
       },
     ];
+    console.log(setDefaultShiftDist(this.shifts));
     this.openEditEmployee({ detail: { id: newId } });
   }
 
   openEditEmployee(event) {
+    if (event.path !== undefined) {
+      const targetPositionLeft = event.path[0].offsetLeft - 175 + 80;
+      if (targetPositionLeft < 10) {
+        this.editPosLeft = 10;
+      } else if (targetPositionLeft + 380 > window.innerWidth) {
+        this.editPosLeft = window.innerWidth - 380 - 30;
+      } else {
+        this.editPosLeft = targetPositionLeft;
+      }
+    } else {
+      this.editPosLeft = window.innerWidth / 2 - 175;
+    }
+
     this.editEmployeeObject = this.employees.filter(
       (item) => item.id === event.detail.id
     )[0];
@@ -88,7 +109,9 @@ class EmployeesView extends LitElement {
     return html`
       ${this.editEmployee
         ? html`<edit-employee
+            posLeft="${this.editPosLeft}"
             .employee="${this.editEmployeeObject}"
+            .shifts="${this.shifts}"
             @close-me="${this.closeEditEmployee}"
             @update-me="${this.updateEmployee}"
           ></edit-employee>`

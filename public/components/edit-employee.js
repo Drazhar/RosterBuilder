@@ -6,6 +6,8 @@ class EditEmployee extends LitElement {
   static get properties() {
     return {
       employee: { type: Object },
+      shifts: { type: Array },
+      posLeft: { type: Number },
     };
   }
 
@@ -25,6 +27,26 @@ class EditEmployee extends LitElement {
     this.employee.plannedWorkingTime = this.shadowRoot.getElementById(
       "plannedWorkingTime"
     ).value;
+    this.employee.overtime = this.shadowRoot.getElementById("overtime").value;
+
+    this.employee.consecutiveWorkingDays.min = this.shadowRoot.getElementById(
+      "cwd_min"
+    ).value;
+    this.employee.consecutiveWorkingDays.prefered = this.shadowRoot.getElementById(
+      "cwd_pref"
+    ).value;
+    this.employee.consecutiveWorkingDays.max = this.shadowRoot.getElementById(
+      "cwd_max"
+    ).value;
+    this.employee.minConsecutiveDaysOff = this.shadowRoot.getElementById(
+      "minConsecutiveDaysOff"
+    ).value;
+
+    this.shifts.forEach((shift) => {
+      this.employee.shift[shift.id] = this.shadowRoot.getElementById(
+        `${shift.id}_weight`
+      ).value;
+    });
 
     // Dispatch event with this employee object to save it to the database or local storage
     this.dispatchEvent(
@@ -44,11 +66,12 @@ class EditEmployee extends LitElement {
   render() {
     return html`
       <div class="greyout">
-        <div class="edit">
+        <div class="edit" style="left: ${this.posLeft}px">
           <img src="${this.employee.avatar}" @click="${this.randomImage}" />
-          <button @click="${this.sendCloseEvent}">X</button>
+          <button @click="${this.sendCloseEvent}" class="x-button">X</button>
           <form>
-            <div class="inputGroup">
+            <fieldset>
+              <legend>General:</legend>
               <label
                 >Name:
                 <input
@@ -59,7 +82,7 @@ class EditEmployee extends LitElement {
                 />
               </label>
               <label
-                >Planned working time:
+                >Planned working time [h]:
                 <input
                   type="number"
                   id="plannedWorkingTime"
@@ -67,8 +90,85 @@ class EditEmployee extends LitElement {
                   isRequired
                 />
               </label>
-            </div>
-            <button type="submit" @click="${this.saveChanges}">Save</button>
+              <label
+                >Overtime [h]:
+                <input
+                  type="number"
+                  id="overtime"
+                  value="${this.employee.overtime}"
+                  isRequired
+                />
+              </label>
+            </fieldset>
+            <fieldset>
+              <legend>Working habit:</legend>
+              <label
+                >Consecutive working days:
+                <div>
+                  <label
+                    >min:
+                    <input
+                      type="number"
+                      id="cwd_min"
+                      value="${this.employee.consecutiveWorkingDays.min}"
+                      isRequired
+                    />
+                  </label>
+                  <label
+                    >prefered:
+                    <input
+                      type="number"
+                      id="cwd_pref"
+                      value="${this.employee.consecutiveWorkingDays.prefered}"
+                      isRequired
+                    />
+                  </label>
+                  <label
+                    >max:
+                    <input
+                      type="number"
+                      id="cwd_max"
+                      value="${this.employee.consecutiveWorkingDays.max}"
+                      isRequired
+                    />
+                  </label>
+                </div>
+              </label>
+              <label
+                >Min consecutive days off:
+                <input
+                  type="number"
+                  id="minConsecutiveDaysOff"
+                  value="${this.employee.minConsecutiveDaysOff}"
+                  isRequired
+                />
+              </label>
+            </fieldset>
+            <fieldset>
+              <legend>
+                Shift options:
+              </legend>
+              ${this.shifts.length > 0
+                ? this.shifts.map(
+                    (shift) => html`<label
+                      >${shift.name}:
+                      <input
+                        type="number"
+                        id="${shift.id}_weight"
+                        value="${this.employee.shift[shift.id]}"
+                        isRequired
+                      />
+                    </label>`
+                  )
+                : html`<p>There are no shifts defined...</p>`}
+            </fieldset>
+            <button
+              type="submit"
+              @click="${this.saveChanges}"
+              style="margin-bottom: 0.2vmax"
+            >
+              Save
+            </button>
           </form>
         </div>
       </div>
@@ -93,18 +193,70 @@ class EditEmployee extends LitElement {
       .edit {
         position: fixed;
         top: 10%;
-        right: 10%;
-        bottom: 10%;
-        left: 10%;
+        width: 380px;
         z-index: 4;
         background-color: white;
-        box-shadow: 2px 2px 8px rgb(57, 62, 70, 0.9);
-        border-radius: 20px;
-        animation-duration: 0.2s;
-        animation-name: popup;
+        box-shadow: 2px 2px 8px rgba(57, 62, 70, 0.9);
+        border-radius: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        /* animation-duration: 0.2s;
+        animation-name: popup; */
       }
 
-      @keyframes popup {
+      .x-button {
+        position: absolute;
+        border-radius: 10px;
+        width: 30px;
+        height: 30px;
+        right: 0;
+        border: 1px solid rgb(57, 62, 70);
+      }
+
+      .x-button:hover {
+        cursor: pointer;
+      }
+
+      form {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        width: 90%;
+      }
+
+      fieldset {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+        border: 1px solid rgba(57, 62, 70, 0.4);
+        margin: 0.2vmax;
+        font-size: 0.9em;
+      }
+
+      legend {
+        color: rgba(57, 62, 70, 0.6);
+        font-size: 0.8em;
+      }
+
+      label {
+        width: 100%;
+        display: flex;
+        padding: 0.3vh 0;
+        flex-direction: row;
+        justify-content: space-between;
+      }
+
+      #plannedWorkingTime::after {
+        content: "h";
+      }
+
+      input {
+        width: 80px;
+      }
+
+      /* @keyframes popup {
         from {
           top: 50%;
           right: 50%;
@@ -118,7 +270,7 @@ class EditEmployee extends LitElement {
           bottom: 10%;
           left: 10%;
         }
-      }
+      } */
     `;
   }
 }

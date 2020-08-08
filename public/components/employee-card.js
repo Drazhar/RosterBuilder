@@ -37,7 +37,7 @@ class EmployeeCard extends LitElement {
       <div class="card" @click=${this.editThisEmployee}>
         <img src="${this.employee.avatar}" />
         ${this.employee.name}
-        <button @click=${this.removeThisEmployee}>Remove</button>
+        <button @click=${this.removeThisEmployee}>X</button>
       </div>
     `;
   }
@@ -69,6 +69,25 @@ class EmployeeCard extends LitElement {
       .card img {
         width: 90px;
         margin-bottom: 8px;
+      }
+
+      button {
+        visibility: hidden;
+        position: absolute;
+        border-radius: 10px;
+        width: 30px;
+        height: 30px;
+        right: 0;
+        top: 0;
+        border: 1px solid rgb(57, 62, 70);
+      }
+
+      button:hover {
+        cursor: pointer;
+      }
+
+      .card:hover button {
+        visibility: visible;
       }
     `;
   }
