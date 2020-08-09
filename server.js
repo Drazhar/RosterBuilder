@@ -35,12 +35,13 @@ app.post("/api/createSchedule", (req, res) => {
       result,
     })
   );
-  myWorker.on("error", (error) =>
+  myWorker.on("error", (error) => {
+    console.log(error);
     res.status(500).json({
       status: "failed",
       result: [],
-    })
-  );
+    });
+  });
 });
 
 // Route everything else to the root

@@ -4,10 +4,12 @@ const testArrays = [
   {
     input: [" ", " ", "D", "D", "N", " ", " ", "D", "D", "D"],
     output: [
-      { value: " ", count: 2 },
+      { value: " ", count: 1 },
+      { value: " ", count: 1 },
       { value: "D", count: 2 },
       { value: "N", count: 1 },
-      { value: " ", count: 2 },
+      { value: " ", count: 1 },
+      { value: " ", count: 1 },
       { value: "D", count: 3 },
     ],
   },

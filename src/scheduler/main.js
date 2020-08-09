@@ -1,13 +1,20 @@
-const { employeeInformationTemp, shiftInformationTemp } = require("./input");
-const input = require("./input");
+// const { employeeInformationTemp, shiftInformationTemp } = require("./input");
+// const input = require("./input");
+const { qualityWorkingHours } = require("./functions/qualityRating");
 
 module.exports = function runScheduler(
   iterations = 1,
-  employeeInformation = employeeInformationTemp,
-  shiftInformation = shiftInformationTemp
+  employeeInformation,
+  shiftInformation
 ) {
   convertToNumbersShiftsObject(shiftInformation); // Converts all strings to numbers which should be numbers
   convertToNumbersEmployeeObject(employeeInformation); // Converts all strings to numbers
+  // Adds missing shift information at employees if some are missing
+  checkIfEmployeeInformationContainsAllShifts(
+    employeeInformation,
+    shiftInformation
+  );
+  // Checking the input correctness should be done in the frontend.
 
   // Add the shift at the first place for a non working day.
   shiftInformation.unshift({
@@ -32,6 +39,16 @@ module.exports = function runScheduler(
     }
 
     // Evaluate result
+    /* Concept for the quality rating:
+    At the core each quality rating should be in a range from 0 to 1 for an 
+    okayisch quality and then exponentially get larger. During the creation 
+    of the quality ratings an array is created which stores all schedules
+    where all quality ratings are between 0 and 1 for further evaluation.
+    Also there is an combined target function for one overall criteria (for
+    example the product of all criteria with a weighting factor). If the 
+    length of the best schedules array is to small, the complete array of
+    all results has to be sorted the get the 10 best candidates.
+    */
     qualityRatings.push({
       totalHourDifference: 0,
       shiftDistribution: 0,
@@ -39,19 +56,20 @@ module.exports = function runScheduler(
     });
 
     createdSchedules[i].forEach((employee) => {
-      qualityRatings[i].totalHourDifference +=
-        Math.abs(
-          employee.information.plannedWorkingTime -
-            employee.schedulingInformation.hoursWorked
-        ) ** 2;
+      // Evaluate the quality for worked hours vs planned hours
+      qualityRatings[i].totalHourDifference += qualityWorkingHours(employee);
+
+      // Calculate criteria for shiftDistribution
       qualityRatings[i].shiftDistribution += evaluateShiftDistributionRating(
         employee.schedulingInformation.shift,
         shiftInformation
       );
 
-      // Check that minConsecutiveDaysOff are used
+      // Calculate criteria for minConsecutiveDaysOff and consecutive working days
       let currentDaysOff = 0;
+      let consecutiveWorkingDaysQuality = 0;
       employee.assignedShifts.forEach((workShift) => {
+        // This part is for minConsecutiveDaysOff
         if (workShift === 0) currentDaysOff++;
         if (
           workShift !== 0 &&
@@ -60,6 +78,10 @@ module.exports = function runScheduler(
         )
           qualityRatings[i].minConsecutiveDaysOffCheck++;
         if (workShift !== 0) currentDaysOff = 0;
+
+        // This is for consecutive working days
+        // Idea: Below min and above max will grant (Diff to prefered * 2) squared.
+        // Below or above prefered will grand (Diff to prefered).
       });
     });
     if (qualityRatings[i].totalHourDifference < minTotalHourDifference) {
@@ -71,8 +93,8 @@ module.exports = function runScheduler(
   let bestSchedules = [];
   for (let i = 0; i < iterations; i++) {
     if (
-      qualityRatings[i].totalHourDifference <= minTotalHourDifference * 1.05 &&
-      qualityRatings[i].minConsecutiveDaysOffCheck === 0
+      qualityRatings[i].totalHourDifference <=
+      minTotalHourDifference * 1.05
     ) {
       bestSchedules.push({
         index: i,
@@ -99,7 +121,7 @@ module.exports = function runScheduler(
   createdSchedules[bestIndex].forEach((employee, i) => {
     employee.assignedShifts.forEach((shift, j) => {
       createdSchedules[bestIndex][i].assignedShifts[j] =
-        shiftInformation[shift].id;
+        employee.schedulingInformation.shift.map[shift];
     });
   });
 
@@ -450,5 +472,18 @@ function convertToNumbersEmployeeObject(employeeInformation) {
     for (const shift in employee.shift) {
       employee.shift[shift] = parseInt(employee.shift[shift], 10);
     }
+  });
+}
+
+function checkIfEmployeeInformationContainsAllShifts(
+  employeeInformation,
+  shiftInformation
+) {
+  employeeInformation.forEach((employee) => {
+    shiftInformation.forEach((shift) => {
+      if (!(shift.id in employee.shift)) {
+        employee.shift[shift.id] = 0;
+      }
+    });
   });
 }

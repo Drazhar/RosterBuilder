@@ -35,6 +35,7 @@ class shiftSchedule extends LitElement {
   async btnCreateSchedule() {
     const createdSchedule = await this.createSchedule();
     if (createdSchedule.status === "success") {
+      console.log(createdSchedule.result);
       this.scheduleToDisplay = createdSchedule.result;
       localStorage.setItem(
         "lastSchedule",
@@ -45,7 +46,7 @@ class shiftSchedule extends LitElement {
 
   async createSchedule() {
     const data = {
-      iterations: 10000,
+      iterations: 1000,
       employees: JSON.parse(window.localStorage.getItem("definedEmployees")),
       shifts: this.shifts,
     };
@@ -77,7 +78,7 @@ class shiftSchedule extends LitElement {
             </tr>
           </thead>
           <tbody>
-            ${this.scheduleToDisplay.map((item, index) => {
+            ${this.scheduleToDisplay.map((item) => {
               return html`
                 <tr>
                   <th class="employeeNames">${item.information.name}</th>
@@ -182,11 +183,15 @@ class shiftSchedule extends LitElement {
       th {
         padding: 1px;
         border: 1px solid rgb(180, 180, 180);
+        border-left-color: rgb(225, 225, 225);
+        border-right-color: rgb(225, 225, 225);
         text-align: center;
         justify-content: center;
         width: 1fr;
         border-radius: 4px;
         opacity: 0.85;
+        overflow: hidden;
+        white-space: nowrap;
       }
 
       td:hover {

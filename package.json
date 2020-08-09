@@ -36,7 +36,7 @@
   "scripts": {
     "start": "webpack-dev-server --config webpack.dev.js --history-api-fallback --open",
     "build": "webpack --config webpack.prod.js",
-    "test": "jest",
+    "test": "jest --watch",
     "node": "node server.js"
   },
   "author": "Philip Trauth",
