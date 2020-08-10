@@ -1,6 +1,7 @@
-// const { employeeInformationTemp, shiftInformationTemp } = require("./input");
-// const input = require("./input");
-const { qualityWorkingHours } = require("./functions/qualityRating");
+const { qualityWorkingHours } = require("./functions/qualityWorkingHours");
+const {
+  evaluateShiftDistributionRating,
+} = require("./functions/evaluateShiftDistributionRating");
 
 module.exports = function runScheduler(
   iterations = 1,
@@ -21,7 +22,6 @@ module.exports = function runScheduler(
     id: " ",
     name: " ",
     workingHours: 0,
-    autoAssign: true,
   });
 
   let createdSchedules = []; // This array will store all informations for the employees and the shift assignments created. It will get huge.
@@ -39,15 +39,14 @@ module.exports = function runScheduler(
     }
 
     // Evaluate result
-    /* Concept for the quality rating:
-    At the core each quality rating should be in a range from 0 to 1 for an 
-    okayisch quality and then exponentially get larger. During the creation 
-    of the quality ratings an array is created which stores all schedules
-    where all quality ratings are between 0 and 1 for further evaluation.
-    Also there is an combined target function for one overall criteria (for
-    example the product of all criteria with a weighting factor). If the 
-    length of the best schedules array is to small, the complete array of
-    all results has to be sorted the get the 10 best candidates.
+    /* Concept for the quality rating: At the core each quality rating should be
+    in a range from 0 to 1 for an okayisch quality and then exponentially get
+    larger. During the creation of the quality ratings an array is created which
+    stores all schedules where all quality ratings are between 0 and 1 for
+    further evaluation. Also there is an combined target function for one
+    overall criteria (for example the product of all criteria with a weighting
+    factor). If the length of the best schedules array is to small, the complete
+    array of all results has to be sorted the get the 10 best candidates.
     */
     qualityRatings.push({
       totalHourDifference: 0,
@@ -61,8 +60,7 @@ module.exports = function runScheduler(
 
       // Calculate criteria for shiftDistribution
       qualityRatings[i].shiftDistribution += evaluateShiftDistributionRating(
-        employee.schedulingInformation.shift,
-        shiftInformation
+        employee.schedulingInformation.shift
       );
 
       // Calculate criteria for minConsecutiveDaysOff and consecutive working days
@@ -128,34 +126,6 @@ module.exports = function runScheduler(
   createdSchedules[bestIndex][0].quality = qualityRatings[bestIndex];
   return createdSchedules[bestIndex];
 };
-
-function evaluateShiftDistributionRating(shiftDistributions, shiftInformation) {
-  let firstAutoAssignShift = 0;
-  let relationWorked = 0;
-  let relationPlanned = 0;
-  let returnValue = 0;
-
-  for (let i = 1; i < shiftInformation.length; i++) {
-    if (shiftInformation[i].autoAssign) {
-      if (firstAutoAssignShift === 0) {
-        firstAutoAssignShift = i;
-      }
-      if (firstAutoAssignShift !== i) {
-        relationWorked =
-          shiftDistributions.worked[i] /
-          shiftDistributions.worked[firstAutoAssignShift];
-        relationPlanned =
-          shiftDistributions.plannedDistribution[i] /
-          shiftDistributions.plannedDistribution[firstAutoAssignShift];
-        returnValue += (relationWorked - relationPlanned) ** 2;
-      }
-    }
-  }
-  if (isNaN(returnValue) || returnValue === Infinity) {
-    return 0;
-  }
-  return returnValue;
-}
 
 function assignEmployees(inputSchedule, day, shiftInformation) {
   for (
@@ -279,27 +249,22 @@ function obtainInformation(inputSchedule, shiftInformation) {
     }
 
     // Distribute shifts
-    for (
-      let i = 1;
-      i < shiftInformation.length - 1;
-      //i < employee.schedulingInformation.shift.plannedDistribution.length;
-      i++
-    ) {
+    for (let i = 1; i < shiftInformation.length - 1; i++) {
       if (employee.schedulingInformation.shift.plannedDistribution[i] === 0) {
         employee.schedulingInformation.possibleShifts[i] = 0;
       }
-      if (shiftInformation[i].autoAssign) {
+      if (employee.schedulingInformation.shift.plannedDistribution[i] > 0) {
         let plannedDist =
           employee.schedulingInformation.shift.plannedDistribution[i] /
           sumAutoAssignDistribution(
             employee.schedulingInformation.shift.plannedDistribution,
-            shiftInformation
+            employee.schedulingInformation.shift.plannedDistribution
           );
         let currentDist =
           employee.schedulingInformation.shift.worked[i] /
           sumAutoAssignDistribution(
             employee.schedulingInformation.shift.worked,
-            shiftInformation
+            employee.schedulingInformation.shift.plannedDistribution
           );
         let relation = plannedDist / currentDist;
         // Some relations are NaN or infinity
@@ -316,17 +281,17 @@ function obtainInformation(inputSchedule, shiftInformation) {
 
     // Lower the probability if working days are high
     reduceProbabilityForHighWorkload(employee);
-    removeAutoAssignSetInterchangeable(
-      employee.schedulingInformation,
-      shiftInformation
-    );
+    // removeAutoAssignSetInterchangeable(
+    //   employee.schedulingInformation,
+    //   shiftInformation
+    // );
   });
 }
 
-function sumAutoAssignDistribution(shiftDistribution, shiftInformation) {
+function sumAutoAssignDistribution(shiftDistribution, plannedDistribution) {
   let sum = 0;
-  for (let i = 1; i < shiftInformation.length; i++) {
-    if (shiftInformation[i].autoAssign) {
+  for (let i = 1; i < plannedDistribution.length; i++) {
+    if (plannedDistribution[i] > 0) {
       sum += shiftDistribution[i];
     }
   }
@@ -354,32 +319,33 @@ function reduceProbabilityForHighWorkload(employee) {
   }
 }
 
-function removeAutoAssignSetInterchangeable(
-  schedulingInformation,
-  shiftInformation
-) {
-  // have to do this even if autoAssign is false, because the shift could be assigned hard coded the day before.
-  for (let i = 1; i < shiftInformation.length; i++) {
-    if (shiftInformation[i].hasOwnProperty("interchangeableWith")) {
-      shiftInformation[i].interchangeableWith.forEach((interchangeables) => {
-        if (
-          schedulingInformation.possibleShifts[i] >
-          schedulingInformation.possibleShifts[interchangeables]
-        ) {
-          schedulingInformation.possibleShifts[interchangeables] =
-            schedulingInformation.possibleShifts[i];
-        } else {
-          schedulingInformation.possibleShifts[i] =
-            schedulingInformation.possibleShifts[interchangeables];
-        }
-      });
-    }
+// function removeAutoAssignSetInterchangeable(
+//   schedulingInformation,
+//   shiftInformation
+// ) {
+//   console.log("schedulingInf", schedulingInformation);
+//   console.log("shiftinfo", shiftInformation);
+//   for (let i = 1; i < shiftInformation.length; i++) {
+//     if (shiftInformation[i].hasOwnProperty("interchangeableWith")) {
+//       shiftInformation[i].interchangeableWith.forEach((interchangeables) => {
+//         if (
+//           schedulingInformation.possibleShifts[i] >
+//           schedulingInformation.possibleShifts[interchangeables]
+//         ) {
+//           schedulingInformation.possibleShifts[interchangeables] =
+//             schedulingInformation.possibleShifts[i];
+//         } else {
+//           schedulingInformation.possibleShifts[i] =
+//             schedulingInformation.possibleShifts[interchangeables];
+//         }
+//       });
+//     }
 
-    if (!shiftInformation[i].autoAssign) {
-      schedulingInformation.possibleShifts[i] = 0;
-    }
-  }
-}
+//     if (!shiftInformation[i].autoAssign) {
+//       schedulingInformation.possibleShifts[i] = 0;
+//     }
+//   }
+// }
 
 function initializeSchedule(employeeInformation) {
   // Initialized a schedule with the employee informations.

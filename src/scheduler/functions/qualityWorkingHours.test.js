@@ -1,4 +1,4 @@
-import { qualityWorkingHours } from "./qualityRating";
+import { qualityWorkingHours } from "./qualityWorkingHours";
 
 test("Overtime 0", () => {
   expect(

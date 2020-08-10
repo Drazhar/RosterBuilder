@@ -1,3 +1,14 @@
+/**
+ * Calculates a quality criteria for the actual working hours
+ * compared to the planned working hours.
+ * TODO: Needs some refactoring
+ * @param {Object} employee - Scheduling information
+ * Need to contain: .information.plannedWorkingTime
+ *                  .information.overtime
+ *                  .schedulingInformation.hoursWorked
+ *
+ * @returns {Number} Quality rating
+ */
 function qualityWorkingHours(employee) {
   // Calculate error square of planned working time vs actual working time
   // Value is between 0 and 1 if its the maximum shift length away from
