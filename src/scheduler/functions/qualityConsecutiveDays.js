@@ -1,0 +1,90 @@
+/**
+ * Calculates the quality for the consecutive days off and the consecutive
+ * working days.
+ *
+ * @param {Object} employee Contains information about the employees settings
+ * regarding the consecutiveworkingDays and minConsecutiveDaysOff in the Object.
+ * also contains the assignedShifts.
+ * @returns {Array} Array[0]: The quality for the consecutiveDaysOff
+ *                  Array[1]: The quality for the consecutiveWorkingDays
+ */
+function qualityConsecutiveDays(employee) {
+  let resultConsecutiveDaysOff = 0;
+  let resultConsecutiveWorkingDays = 0;
+
+  let currentDaysOff = 0;
+  let currentDaysWorking = 0;
+  employee.assignedShifts.forEach((workShift) => {
+    // This part is for minConsecutiveDaysOff
+    if (workShift === 0) {
+      currentDaysOff++;
+    } else {
+      currentDaysWorking++;
+    }
+
+    if (
+      workShift !== 0 &&
+      currentDaysOff < employee.information.minConsecutiveDaysOff &&
+      currentDaysOff !== 0
+    ) {
+      // Switched from at least one day off to working
+      resultConsecutiveDaysOff++;
+    } else if (workShift === 0 && currentDaysWorking !== 0) {
+      // Switched from working to at least a day off
+      if (
+        currentDaysWorking < employee.information.consecutiveWorkingDays.min ||
+        currentDaysWorking > employee.information.consecutiveWorkingDays.max
+      ) {
+        resultConsecutiveWorkingDays +=
+          ((currentDaysWorking -
+            employee.information.consecutiveWorkingDays.prefered) *
+            2) **
+          2;
+      } else if (
+        currentDaysWorking !==
+        employee.information.consecutiveWorkingDays.prefered
+      ) {
+        let relativeDistance =
+          employee.information.consecutiveWorkingDays.max -
+          employee.information.consecutiveWorkingDays.prefered;
+
+        if (
+          currentDaysWorking <
+          employee.information.consecutiveWorkingDays.prefered
+        ) {
+          relativeDistance =
+            employee.information.consecutiveWorkingDays.prefered -
+            employee.information.consecutiveWorkingDays.min;
+        }
+        let difference = Math.abs(
+          currentDaysWorking -
+            employee.information.consecutiveWorkingDays.prefered
+        );
+        resultConsecutiveWorkingDays += difference / relativeDistance;
+      }
+    }
+    // At the end of the array, check for to many working days
+    if (currentDaysWorking > employee.information.consecutiveWorkingDays.max) {
+      resultConsecutiveWorkingDays +=
+        ((currentDaysWorking -
+          employee.information.consecutiveWorkingDays.prefered) *
+          2) **
+        2;
+    }
+
+    if (workShift !== 0) {
+      currentDaysOff = 0;
+    } else {
+      currentDaysWorking = 0;
+    }
+
+    // This is for consecutive working days
+    // Idea: Below min and above max will grant (Diff to prefered * 2) squared.
+    // Below or above prefered will grand (Diff to prefered, relative to the
+    // distance).
+  });
+
+  return [resultConsecutiveDaysOff, resultConsecutiveWorkingDays];
+}
+
+module.exports = { qualityConsecutiveDays };

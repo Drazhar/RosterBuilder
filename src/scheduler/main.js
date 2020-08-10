@@ -2,6 +2,9 @@ const { qualityWorkingHours } = require("./functions/qualityWorkingHours");
 const {
   evaluateShiftDistributionRating,
 } = require("./functions/evaluateShiftDistributionRating");
+const {
+  qualityConsecutiveDays,
+} = require("./functions/qualityConsecutiveDays");
 
 module.exports = function runScheduler(
   iterations = 1,
@@ -51,7 +54,8 @@ module.exports = function runScheduler(
     qualityRatings.push({
       totalHourDifference: 0,
       shiftDistribution: 0,
-      minConsecutiveDaysOffCheck: 0,
+      minConsecutiveDaysOff: 0,
+      consecutiveWorkingDays: 0,
     });
 
     createdSchedules[i].forEach((employee) => {
@@ -64,23 +68,9 @@ module.exports = function runScheduler(
       );
 
       // Calculate criteria for minConsecutiveDaysOff and consecutive working days
-      let currentDaysOff = 0;
-      let consecutiveWorkingDaysQuality = 0;
-      employee.assignedShifts.forEach((workShift) => {
-        // This part is for minConsecutiveDaysOff
-        if (workShift === 0) currentDaysOff++;
-        if (
-          workShift !== 0 &&
-          currentDaysOff < employee.information.minConsecutiveDaysOff &&
-          currentDaysOff !== 0
-        )
-          qualityRatings[i].minConsecutiveDaysOffCheck++;
-        if (workShift !== 0) currentDaysOff = 0;
-
-        // This is for consecutive working days
-        // Idea: Below min and above max will grant (Diff to prefered * 2) squared.
-        // Below or above prefered will grand (Diff to prefered).
-      });
+      let resultConsecutiveDays = qualityConsecutiveDays(employee);
+      qualityRatings[i].minConsecutiveDaysOff += resultConsecutiveDays[0];
+      qualityRatings[i].consecutiveWorkingDays += resultConsecutiveDays[1];
     });
     if (qualityRatings[i].totalHourDifference < minTotalHourDifference) {
       minTotalHourDifference = qualityRatings[i].totalHourDifference;

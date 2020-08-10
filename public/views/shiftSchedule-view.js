@@ -46,7 +46,7 @@ class shiftSchedule extends LitElement {
 
   async createSchedule() {
     const data = {
-      iterations: 1000,
+      iterations: 100000,
       employees: JSON.parse(window.localStorage.getItem("definedEmployees")),
       shifts: this.shifts,
     };
@@ -127,8 +127,15 @@ class shiftSchedule extends LitElement {
               <td>Quality consecutive days off</td>
               <td>
                 ${Math.round(
-                  this.scheduleToDisplay[0].quality.minConsecutiveDaysOffCheck *
-                    1000
+                  this.scheduleToDisplay[0].quality.minConsecutiveDaysOff * 1000
+                ) / 1000}
+              </td>
+            </tr>
+            <tr>
+              <td>Squared total hour difference</td>
+              <td>
+                ${Math.round(
+                  this.scheduleToDisplay[0].quality.totalHourDifference * 1000
                 ) / 1000}
               </td>
             </tr>
@@ -141,10 +148,11 @@ class shiftSchedule extends LitElement {
               </td>
             </tr>
             <tr>
-              <td>Squared total hour difference</td>
+              <td>Consecutive working days quality</td>
               <td>
                 ${Math.round(
-                  this.scheduleToDisplay[0].quality.totalHourDifference * 1000
+                  this.scheduleToDisplay[0].quality.consecutiveWorkingDays *
+                    1000
                 ) / 1000}
               </td>
             </tr>
