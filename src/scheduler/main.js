@@ -84,8 +84,7 @@ module.exports = function runScheduler(
     // Store the best value of each criteria for later filtering
     for (const key in bestRatings) {
       // Build the targetSum and targetProduct
-      targetFunctions[i] *=
-        qualityRatings[i][key] <= 0 ? 1 : qualityRatings[i][key];
+      targetFunctions[i] *= qualityRatings[i][key] + 1;
 
       // Find the best ratings
       if (qualityRatings[i][key] < bestRatings[key]) {
