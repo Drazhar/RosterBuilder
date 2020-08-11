@@ -6,22 +6,27 @@ class shiftSchedule extends LitElement {
     return {
       scheduleToDisplay: { type: Array },
       shifts: { type: Array },
+      indexToDisplay: { type: Number },
     };
   }
 
   constructor() {
     super();
 
+    this.indexToDisplay = 0;
+
     if (localStorage.getItem("lastSchedule") !== null) {
       this.scheduleToDisplay = JSON.parse(localStorage.getItem("lastSchedule"));
     } else {
       this.scheduleToDisplay = [
-        {
-          assignedShifts: [" "],
-          information: { name: "empty" },
-          schedulingInformation: { hoursWorked: 0 },
-          quality: { minConsecutiveDaysOffCheck: 0 },
-        },
+        [
+          {
+            assignedShifts: [" "],
+            information: { name: "empty" },
+            schedulingInformation: { hoursWorked: 0 },
+            quality: { minConsecutiveDaysOffCheck: 0 },
+          },
+        ],
       ];
     }
 
@@ -41,6 +46,18 @@ class shiftSchedule extends LitElement {
         "lastSchedule",
         JSON.stringify(this.scheduleToDisplay)
       );
+    }
+  }
+
+  showNext() {
+    if (this.indexToDisplay < this.scheduleToDisplay.length - 1) {
+      this.indexToDisplay++;
+    }
+  }
+
+  showPrev() {
+    if (this.indexToDisplay > 0) {
+      this.indexToDisplay--;
     }
   }
 
@@ -71,14 +88,14 @@ class shiftSchedule extends LitElement {
           <thead>
             <tr>
               <th></th>
-              ${this.scheduleToDisplay[0].assignedShifts.map(
-                (item, index) => html`<th>${index}</th>`
-              )}
+              ${this.scheduleToDisplay[
+                this.indexToDisplay
+              ][0].assignedShifts.map((item, index) => html`<th>${index}</th>`)}
               <th>WH</th>
             </tr>
           </thead>
           <tbody>
-            ${this.scheduleToDisplay.map((item) => {
+            ${this.scheduleToDisplay[this.indexToDisplay].map((item) => {
               return html`
                 <tr>
                   <th class="employeeNames">${item.information.name}</th>
@@ -127,7 +144,8 @@ class shiftSchedule extends LitElement {
               <td>Quality consecutive days off</td>
               <td>
                 ${Math.round(
-                  this.scheduleToDisplay[0].quality.minConsecutiveDaysOff * 1000
+                  this.scheduleToDisplay[this.indexToDisplay][0].quality
+                    .minConsecutiveDaysOff * 1000
                 ) / 1000}
               </td>
             </tr>
@@ -135,7 +153,8 @@ class shiftSchedule extends LitElement {
               <td>Squared total hour difference</td>
               <td>
                 ${Math.round(
-                  this.scheduleToDisplay[0].quality.totalHourDifference * 1000
+                  this.scheduleToDisplay[this.indexToDisplay][0].quality
+                    .totalHourDifference * 1000
                 ) / 1000}
               </td>
             </tr>
@@ -143,7 +162,8 @@ class shiftSchedule extends LitElement {
               <td>Shift distribution</td>
               <td>
                 ${Math.round(
-                  this.scheduleToDisplay[0].quality.shiftDistribution * 1000
+                  this.scheduleToDisplay[this.indexToDisplay][0].quality
+                    .shiftDistribution * 1000
                 ) / 1000}
               </td>
             </tr>
@@ -151,14 +171,26 @@ class shiftSchedule extends LitElement {
               <td>Consecutive working days quality</td>
               <td>
                 ${Math.round(
-                  this.scheduleToDisplay[0].quality.consecutiveWorkingDays *
-                    1000
+                  this.scheduleToDisplay[this.indexToDisplay][0].quality
+                    .consecutiveWorkingDays * 1000
                 ) / 1000}
+              </td>
+            </tr>
+            <tr>
+              <td>Target function:</td>
+              <td>
+                ${Math.round(
+                  this.scheduleToDisplay[this.indexToDisplay][0].target
+                )}
               </td>
             </tr>
           </tbody>
         </table>
         <button @click="${this.btnCreateSchedule}">Create new roster</button>
+        <p>Number of good schedules: ${this.scheduleToDisplay.length}</p>
+        <p>Currently displayed: ${this.indexToDisplay + 1}</p>
+        <button @click="${this.showNext}">Show next</button>
+        <button @click="${this.showPrev}">Show prev</button>
       </div>
     `;
   }

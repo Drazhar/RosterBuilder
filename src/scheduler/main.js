@@ -5,6 +5,7 @@ const {
 const {
   qualityConsecutiveDays,
 } = require("./functions/qualityConsecutiveDays");
+const { findBestSchedules } = require("./functions/findBestSchedules");
 
 module.exports = function runScheduler(
   iterations = 1,
@@ -29,9 +30,15 @@ module.exports = function runScheduler(
 
   let createdSchedules = []; // This array will store all informations for the employees and the shift assignments created. It will get huge.
   let qualityRatings = [];
+  let bestRatings = {
+    totalHourDifference: Infinity,
+    shiftDistribution: Infinity,
+    minConsecutiveDaysOff: Infinity,
+    consecutiveWorkingDays: Infinity,
+  };
+  let targetFunctions = [];
+  let bestTargetFunction = Infinity;
   const numberOfDays = 30; // This should be set outside of the function later.
-
-  let minTotalHourDifference = Infinity;
 
   for (let i = 0; i < iterations; i++) {
     createdSchedules.push(initializeSchedule(employeeInformation));
@@ -57,6 +64,7 @@ module.exports = function runScheduler(
       minConsecutiveDaysOff: 0,
       consecutiveWorkingDays: 0,
     });
+    targetFunctions.push(1);
 
     createdSchedules[i].forEach((employee) => {
       // Evaluate the quality for worked hours vs planned hours
@@ -72,49 +80,30 @@ module.exports = function runScheduler(
       qualityRatings[i].minConsecutiveDaysOff += resultConsecutiveDays[0];
       qualityRatings[i].consecutiveWorkingDays += resultConsecutiveDays[1];
     });
-    if (qualityRatings[i].totalHourDifference < minTotalHourDifference) {
-      minTotalHourDifference = qualityRatings[i].totalHourDifference;
+
+    // Store the best value of each criteria for later filtering
+    for (const key in bestRatings) {
+      // Build the targetSum and targetProduct
+      targetFunctions[i] *=
+        qualityRatings[i][key] <= 0 ? 1 : qualityRatings[i][key];
+
+      // Find the best ratings
+      if (qualityRatings[i][key] < bestRatings[key]) {
+        bestRatings[key] = qualityRatings[i][key];
+      }
+    }
+    if (targetFunctions[i] < bestTargetFunction) {
+      bestTargetFunction = targetFunctions[i];
     }
   }
 
-  // return best schedule
-  let bestSchedules = [];
-  for (let i = 0; i < iterations; i++) {
-    if (
-      qualityRatings[i].totalHourDifference <=
-      minTotalHourDifference * 1.05
-    ) {
-      bestSchedules.push({
-        index: i,
-        totalHourDifference: qualityRatings[i].totalHourDifference,
-      });
-    }
-  }
-
-  // find best shift distribution from best hour difference distributions
-  let bestDistribution = Infinity;
-  let bestIndex = bestSchedules[0].index;
-  bestSchedules.forEach((scheduleMap) => {
-    scheduleMap.distributionRating =
-      qualityRatings[scheduleMap.index].shiftDistribution;
-    if (
-      qualityRatings[scheduleMap.index].shiftDistribution < bestDistribution
-    ) {
-      bestDistribution = qualityRatings[scheduleMap.index].shiftDistribution;
-      bestIndex = scheduleMap.index;
-    }
-  });
-
-  // Replace numbers with names for better overview
-  createdSchedules[bestIndex].forEach((employee, i) => {
-    employee.assignedShifts.forEach((shift, j) => {
-      createdSchedules[bestIndex][i].assignedShifts[j] =
-        employee.schedulingInformation.shift.map[shift];
-    });
-  });
-
-  createdSchedules[bestIndex][0].quality = qualityRatings[bestIndex];
-  return createdSchedules[bestIndex];
+  return findBestSchedules(
+    createdSchedules,
+    qualityRatings,
+    bestRatings,
+    targetFunctions,
+    bestTargetFunction
+  );
 };
 
 function assignEmployees(inputSchedule, day, shiftInformation) {

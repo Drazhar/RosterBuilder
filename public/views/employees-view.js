@@ -62,7 +62,6 @@ class EmployeesView extends LitElement {
         avatar: randomAvataaarURL(newId),
       },
     ];
-    console.log(setDefaultShiftDist(this.shifts));
     this.openEditEmployee({ detail: { id: newId } });
   }
 
