@@ -114,3 +114,51 @@ test('Consecutive Working Days: Above max', () => {
   expect(result[0]).toBeCloseTo(0);
   expect(result[1]).toBeGreaterThan(1);
 });
+
+test('Occuring Error during development', () => {
+  let result = qualityConsecutiveDays({
+    information: {
+      consecutiveWorkingDays: {
+        min: 2,
+        max: 5,
+        preferred: 4,
+      },
+      minConsecutiveDaysOff: 2,
+    },
+    assignedShifts: [
+      0,
+      0,
+      0,
+      3,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      3,
+      3,
+      3,
+      3,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      2,
+      2,
+      2,
+      0,
+      0,
+      0,
+      0,
+      2,
+      2,
+    ],
+  });
+
+  console.log(result);
+  expect(result[0]).toBeGreaterThan(0);
+});

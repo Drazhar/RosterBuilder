@@ -29,12 +29,17 @@ module.exports = function runScheduler(
   });
 
   let createdSchedules = []; // This array will store all information for the employees and the shift assignments created. It will get huge.
-  let qualityRatings = [];
   let bestRatings = {
     totalHourDifference: Infinity,
     shiftDistribution: Infinity,
     minConsecutiveDaysOff: Infinity,
     consecutiveWorkingDays: Infinity,
+  };
+  let targetWeights = {
+    totalHourDifference: 1,
+    shiftDistribution: 0.2,
+    minConsecutiveDaysOff: 1,
+    consecutiveWorkingDays: 0.2,
   };
   let targetFunctions = [];
   let bestTargetFunction = Infinity;
@@ -58,51 +63,45 @@ module.exports = function runScheduler(
     factor). If the length of the best schedules array is to small, the complete
     array of all results has to be sorted the get the 10 best candidates.
     */
-    qualityRatings.push({
-      totalHourDifference: 0,
-      shiftDistribution: 0,
-      minConsecutiveDaysOff: 0,
-      consecutiveWorkingDays: 0,
-    });
-    targetFunctions.push(1);
 
     createdSchedules[i].forEach((employee) => {
       // Evaluate the quality for worked hours vs planned hours
-      qualityRatings[i].totalHourDifference += qualityWorkingHours(employee);
+      createdSchedules[i][0].quality.totalHourDifference += qualityWorkingHours(
+        employee
+      );
 
       // Calculate criteria for shiftDistribution
-      qualityRatings[i].shiftDistribution += evaluateShiftDistributionRating(
+      createdSchedules[
+        i
+      ][0].quality.shiftDistribution += evaluateShiftDistributionRating(
         employee.schedulingInformation.shift
       );
 
       // Calculate criteria for minConsecutiveDaysOff and consecutive working days
       let resultConsecutiveDays = qualityConsecutiveDays(employee);
-      qualityRatings[i].minConsecutiveDaysOff += resultConsecutiveDays[0];
-      qualityRatings[i].consecutiveWorkingDays += resultConsecutiveDays[1];
+      createdSchedules[i][0].quality.minConsecutiveDaysOff +=
+        resultConsecutiveDays[0];
+      createdSchedules[i][0].quality.consecutiveWorkingDays +=
+        resultConsecutiveDays[1];
     });
 
     // Store the best value of each criteria for later filtering
     for (const key in bestRatings) {
-      // Build the targetSum and targetProduct
-      targetFunctions[i] *= qualityRatings[i][key] + 1;
+      // Build the targetProduct
+      createdSchedules[i][0].target *=
+        (createdSchedules[i][0].quality[key] + 1) ** targetWeights[key];
 
       // Find the best ratings
-      if (qualityRatings[i][key] < bestRatings[key]) {
-        bestRatings[key] = qualityRatings[i][key];
+      if (createdSchedules[i][0].quality[key] < bestRatings[key]) {
+        bestRatings[key] = createdSchedules[i][0].quality[key];
       }
     }
-    if (targetFunctions[i] < bestTargetFunction) {
-      bestTargetFunction = targetFunctions[i];
+    if (createdSchedules[i][0].target < bestTargetFunction) {
+      bestTargetFunction = createdSchedules[i][0].target;
     }
   }
 
-  return findBestSchedules(
-    createdSchedules,
-    qualityRatings,
-    bestRatings,
-    targetFunctions,
-    bestTargetFunction
-  );
+  return findBestSchedules(createdSchedules, bestRatings, bestTargetFunction);
 };
 
 function assignEmployees(inputSchedule, day, shiftInformation) {
@@ -358,6 +357,13 @@ function initializeSchedule(employeeInformation) {
       assignedShifts: [],
     });
   });
+  initializedSchedule[0].quality = {
+    totalHourDifference: 0,
+    shiftDistribution: 0,
+    minConsecutiveDaysOff: 0,
+    consecutiveWorkingDays: 0,
+  };
+  initializedSchedule[0].target = 1;
   return initializedSchedule;
 }
 

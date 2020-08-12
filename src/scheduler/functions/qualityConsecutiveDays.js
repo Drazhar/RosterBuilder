@@ -77,11 +77,6 @@ function qualityConsecutiveDays(employee) {
     } else {
       currentDaysWorking = 0;
     }
-
-    // This is for consecutive working days
-    // Idea: Below min and above max will grant (Diff to preferred * 2) squared.
-    // Below or above preferred will grand (Diff to preferred, relative to the
-    // distance).
   });
 
   return [resultConsecutiveDaysOff, resultConsecutiveWorkingDays];
