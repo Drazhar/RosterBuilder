@@ -6,7 +6,7 @@ $background-color: rgba(57, 62, 70, 0.1);
 
 /* BASE SETTINGS */
 * {
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif;
   padding: 0;
   margin: 0;
 }
@@ -72,7 +72,7 @@ main {
   }
 
   &::before {
-    content: "";
+    content: '';
     position: absolute;
     height: 0;
     width: 0;

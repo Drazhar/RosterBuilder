@@ -3,7 +3,7 @@
  * working days.
  *
  * @param {Object} employee Contains information about the employees settings
- * regarding the consecutiveworkingDays and minConsecutiveDaysOff in the Object.
+ * regarding the consecutiveWorkingDays and minConsecutiveDaysOff in the Object.
  * also contains the assignedShifts.
  * @returns {Array} Array[0]: The quality for the consecutiveDaysOff
  *                  Array[1]: The quality for the consecutiveWorkingDays
@@ -37,28 +37,28 @@ function qualityConsecutiveDays(employee) {
       ) {
         resultConsecutiveWorkingDays +=
           ((currentDaysWorking -
-            employee.information.consecutiveWorkingDays.prefered) *
+            employee.information.consecutiveWorkingDays.preferred) *
             2) **
           2;
       } else if (
         currentDaysWorking !==
-        employee.information.consecutiveWorkingDays.prefered
+        employee.information.consecutiveWorkingDays.preferred
       ) {
         let relativeDistance =
           employee.information.consecutiveWorkingDays.max -
-          employee.information.consecutiveWorkingDays.prefered;
+          employee.information.consecutiveWorkingDays.preferred;
 
         if (
           currentDaysWorking <
-          employee.information.consecutiveWorkingDays.prefered
+          employee.information.consecutiveWorkingDays.preferred
         ) {
           relativeDistance =
-            employee.information.consecutiveWorkingDays.prefered -
+            employee.information.consecutiveWorkingDays.preferred -
             employee.information.consecutiveWorkingDays.min;
         }
         let difference = Math.abs(
           currentDaysWorking -
-            employee.information.consecutiveWorkingDays.prefered
+            employee.information.consecutiveWorkingDays.preferred
         );
         resultConsecutiveWorkingDays += difference / relativeDistance;
       }
@@ -67,7 +67,7 @@ function qualityConsecutiveDays(employee) {
     if (currentDaysWorking > employee.information.consecutiveWorkingDays.max) {
       resultConsecutiveWorkingDays +=
         ((currentDaysWorking -
-          employee.information.consecutiveWorkingDays.prefered) *
+          employee.information.consecutiveWorkingDays.preferred) *
           2) **
         2;
     }
@@ -79,8 +79,8 @@ function qualityConsecutiveDays(employee) {
     }
 
     // This is for consecutive working days
-    // Idea: Below min and above max will grant (Diff to prefered * 2) squared.
-    // Below or above prefered will grand (Diff to prefered, relative to the
+    // Idea: Below min and above max will grant (Diff to preferred * 2) squared.
+    // Below or above preferred will grand (Diff to preferred, relative to the
     // distance).
   });
 

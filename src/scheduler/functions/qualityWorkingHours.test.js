@@ -1,6 +1,6 @@
-import { qualityWorkingHours } from "./qualityWorkingHours";
+import { qualityWorkingHours } from './qualityWorkingHours';
 
-test("Overtime 0", () => {
+test('Overtime 0', () => {
   expect(
     qualityWorkingHours({
       information: {
@@ -38,7 +38,7 @@ test("Overtime 0", () => {
   ).toBeCloseTo(2);
 });
 
-test("Overtime positive", () => {
+test('Overtime positive', () => {
   expect(
     qualityWorkingHours({
       information: {
@@ -76,7 +76,7 @@ test("Overtime positive", () => {
   ).toBeCloseTo(400);
 });
 
-test("Overtime negative", () => {
+test('Overtime negative', () => {
   expect(
     qualityWorkingHours({
       information: {

@@ -1,6 +1,6 @@
-import { LitElement, html, css } from "lit-element";
-import { nanoid } from "nanoid";
-import { randomAvataaarURL } from "../src/randomAvataaarURL";
+import { LitElement, html, css } from 'lit-element';
+import { nanoid } from 'nanoid';
+import { randomAvataaarURL } from '../src/randomAvataaarURL';
 
 class EditEmployee extends LitElement {
   static get properties() {
@@ -16,30 +16,30 @@ class EditEmployee extends LitElement {
   }
 
   sendCloseEvent() {
-    this.dispatchEvent(new CustomEvent("close-me", {}));
+    this.dispatchEvent(new CustomEvent('close-me', {}));
   }
 
   saveChanges(event) {
     event.preventDefault();
 
     // Update the properties of this class
-    this.employee.name = this.shadowRoot.getElementById("name").value;
+    this.employee.name = this.shadowRoot.getElementById('name').value;
     this.employee.plannedWorkingTime = this.shadowRoot.getElementById(
-      "plannedWorkingTime"
+      'plannedWorkingTime'
     ).value;
-    this.employee.overtime = this.shadowRoot.getElementById("overtime").value;
+    this.employee.overtime = this.shadowRoot.getElementById('overtime').value;
 
     this.employee.consecutiveWorkingDays.min = this.shadowRoot.getElementById(
-      "cwd_min"
+      'cwd_min'
     ).value;
-    this.employee.consecutiveWorkingDays.prefered = this.shadowRoot.getElementById(
-      "cwd_pref"
+    this.employee.consecutiveWorkingDays.preferred = this.shadowRoot.getElementById(
+      'cwd_pref'
     ).value;
     this.employee.consecutiveWorkingDays.max = this.shadowRoot.getElementById(
-      "cwd_max"
+      'cwd_max'
     ).value;
     this.employee.minConsecutiveDaysOff = this.shadowRoot.getElementById(
-      "minConsecutiveDaysOff"
+      'minConsecutiveDaysOff'
     ).value;
 
     this.shifts.forEach((shift) => {
@@ -50,7 +50,7 @@ class EditEmployee extends LitElement {
 
     // Dispatch event with this employee object to save it to the database or local storage
     this.dispatchEvent(
-      new CustomEvent("update-me", {
+      new CustomEvent('update-me', {
         detail: {
           employee: this.employee,
         },
@@ -115,11 +115,11 @@ class EditEmployee extends LitElement {
                     />
                   </label>
                   <label
-                    >prefered:
+                    >preferred:
                     <input
                       type="number"
                       id="cwd_pref"
-                      value="${this.employee.consecutiveWorkingDays.prefered}"
+                      value="${this.employee.consecutiveWorkingDays.preferred}"
                       isRequired
                     />
                   </label>
@@ -271,4 +271,4 @@ class EditEmployee extends LitElement {
   }
 }
 
-customElements.define("edit-employee", EditEmployee);
+customElements.define('edit-employee', EditEmployee);

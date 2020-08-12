@@ -1,8 +1,8 @@
-import "./views/shiftSchedule-view";
-import "./views/employees-view.js";
+import './views/shiftSchedule-view';
+import './views/employees-view.js';
 // import "./views/testing-view";
-import "./style.scss";
-import "./src/routing";
+import './style.scss';
+import './src/routing';
 
 // Testing the scheduler
 // const runScheduler = require("./../src/scheduler/main");

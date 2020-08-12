@@ -1,11 +1,11 @@
-const { qualityWorkingHours } = require("./functions/qualityWorkingHours");
+const { qualityWorkingHours } = require('./functions/qualityWorkingHours');
 const {
   evaluateShiftDistributionRating,
-} = require("./functions/evaluateShiftDistributionRating");
+} = require('./functions/evaluateShiftDistributionRating');
 const {
   qualityConsecutiveDays,
-} = require("./functions/qualityConsecutiveDays");
-const { findBestSchedules } = require("./functions/findBestSchedules");
+} = require('./functions/qualityConsecutiveDays');
+const { findBestSchedules } = require('./functions/findBestSchedules');
 
 module.exports = function runScheduler(
   iterations = 1,
@@ -23,12 +23,12 @@ module.exports = function runScheduler(
 
   // Add the shift at the first place for a non working day.
   shiftInformation.unshift({
-    id: " ",
-    name: " ",
+    id: ' ',
+    name: ' ',
     workingHours: 0,
   });
 
-  let createdSchedules = []; // This array will store all informations for the employees and the shift assignments created. It will get huge.
+  let createdSchedules = []; // This array will store all information for the employees and the shift assignments created. It will get huge.
   let qualityRatings = [];
   let bestRatings = {
     totalHourDifference: Infinity,
@@ -44,13 +44,13 @@ module.exports = function runScheduler(
     createdSchedules.push(initializeSchedule(employeeInformation));
     for (let currentDay = 0; currentDay < numberOfDays; currentDay++) {
       obtainInformation(createdSchedules[i], shiftInformation);
-      // ToDo: Modifiy priorities according to employee wishes.
+      // ToDo: Modify priorities according to employee wishes.
       assignEmployees(createdSchedules[i], currentDay, shiftInformation);
     }
 
     // Evaluate result
     /* Concept for the quality rating: At the core each quality rating should be
-    in a range from 0 to 1 for an okayisch quality and then exponentially get
+    in a range from 0 to 1 for an acceptable quality and then exponentially get
     larger. During the creation of the quality ratings an array is created which
     stores all schedules where all quality ratings are between 0 and 1 for
     further evaluation. Also there is an combined target function for one
@@ -158,7 +158,7 @@ function updateSchedulingInformation(
   currentShift,
   shiftInformation
 ) {
-  // need to add the interchangeables!!!
+  // need to add the interchangeable!!!
   if (schedulingInformation.recentAssignment.shift === currentShift) {
     schedulingInformation.recentAssignment.numberOfDays++;
   } else {
@@ -204,14 +204,14 @@ function obtainInformation(inputSchedule, shiftInformation) {
         ] = 1000;
       } else if (
         employee.schedulingInformation.recentAssignment.numberOfDays <
-        employee.information.consecutiveWorkingDays.prefered
+        employee.information.consecutiveWorkingDays.preferred
       ) {
         employee.schedulingInformation.possibleShifts[
           employee.schedulingInformation.recentAssignment.shift
         ] =
-          ((employee.information.consecutiveWorkingDays.prefered -
+          ((employee.information.consecutiveWorkingDays.preferred -
             employee.schedulingInformation.recentAssignment.numberOfDays) /
-            employee.information.consecutiveWorkingDays.prefered) *
+            employee.information.consecutiveWorkingDays.preferred) *
           100;
       } else if (
         employee.schedulingInformation.recentAssignment.numberOfDays <
@@ -278,7 +278,7 @@ function sumAutoAssignDistribution(shiftDistribution, plannedDistribution) {
 
 function reduceProbabilityForHighWorkload(employee) {
   const reducePlannedReached = 0.9; // The factor by which the probability is reduced if the planned working days are reached
-  // If workingDays are larger than plannedWorkingDays, the formla could produce negative probabilities
+  // If workingDays are larger than plannedWorkingDays, the formula could produce negative probabilities
   if (
     employee.schedulingInformation.hoursWorked <=
     employee.information.plannedWorkingTime
@@ -302,19 +302,19 @@ function reduceProbabilityForHighWorkload(employee) {
 //   shiftInformation
 // ) {
 //   console.log("schedulingInf", schedulingInformation);
-//   console.log("shiftinfo", shiftInformation);
+//   console.log("shift information", shiftInformation);
 //   for (let i = 1; i < shiftInformation.length; i++) {
 //     if (shiftInformation[i].hasOwnProperty("interchangeableWith")) {
-//       shiftInformation[i].interchangeableWith.forEach((interchangeables) => {
+//       shiftInformation[i].interchangeableWith.forEach((interchangeable) => {
 //         if (
 //           schedulingInformation.possibleShifts[i] >
-//           schedulingInformation.possibleShifts[interchangeables]
+//           schedulingInformation.possibleShifts[interchangeable]
 //         ) {
-//           schedulingInformation.possibleShifts[interchangeables] =
+//           schedulingInformation.possibleShifts[interchangeable] =
 //             schedulingInformation.possibleShifts[i];
 //         } else {
 //           schedulingInformation.possibleShifts[i] =
-//             schedulingInformation.possibleShifts[interchangeables];
+//             schedulingInformation.possibleShifts[interchangeable];
 //         }
 //       });
 //     }
@@ -326,7 +326,7 @@ function reduceProbabilityForHighWorkload(employee) {
 // }
 
 function initializeSchedule(employeeInformation) {
-  // Initialized a schedule with the employee informations.
+  // Initialized a schedule with the employee information.
   let initializedSchedule = [];
   employeeInformation.forEach((employee) => {
     const parsedShiftInfo = parseShiftObject(employee);
@@ -339,7 +339,7 @@ function initializeSchedule(employeeInformation) {
         consecutiveWorkingDays: {
           min: employee.consecutiveWorkingDays.min,
           max: employee.consecutiveWorkingDays.max,
-          prefered: employee.consecutiveWorkingDays.prefered,
+          preferred: employee.consecutiveWorkingDays.preferred,
         },
         minConsecutiveDaysOff: employee.minConsecutiveDaysOff,
       },
@@ -369,7 +369,7 @@ function parseShiftObject(shiftDist) {
   // Fill for day off shift
   plannedDistribution.push(0);
   workedDistribution.push(0);
-  map.push(" ");
+  map.push(' ');
 
   for (const shift in shiftDist.shift) {
     plannedDistribution.push(shiftDist.shift[shift]);
@@ -405,8 +405,8 @@ function convertToNumbersEmployeeObject(employeeInformation) {
       employee.consecutiveWorkingDays.min,
       10
     );
-    employee.consecutiveWorkingDays.prefered = parseInt(
-      employee.consecutiveWorkingDays.prefered,
+    employee.consecutiveWorkingDays.preferred = parseInt(
+      employee.consecutiveWorkingDays.preferred,
       10
     );
     employee.consecutiveWorkingDays.max = parseInt(

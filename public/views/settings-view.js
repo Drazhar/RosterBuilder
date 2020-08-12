@@ -1,4 +1,4 @@
-import { LitElement, html, css } from "lit-element";
+import { LitElement, html, css } from 'lit-element';
 
 class SettingsView extends LitElement {
   static get properties() {
@@ -20,4 +20,4 @@ class SettingsView extends LitElement {
   }
 }
 
-customElements.define("settings-view", SettingsView);
+customElements.define('settings-view', SettingsView);

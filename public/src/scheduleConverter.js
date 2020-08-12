@@ -4,7 +4,7 @@ export function scheduleConverter(plan) {
     if (
       result.length === 0 ||
       result[result.length - 1].value !== element ||
-      element === " "
+      element === ' '
     ) {
       result.push({
         value: element,

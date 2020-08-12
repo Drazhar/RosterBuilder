@@ -1,7 +1,7 @@
-import { graphColors } from "./environment";
+import { graphColors } from './environment';
 
 export function autoColor(shiftsArray) {
-  let result = { backgroundColor: "FFF", textColor: "000" };
+  let result = { backgroundColor: 'FFF', textColor: '000' };
 
   // Define the background color
   for (const color of graphColors) {
@@ -54,12 +54,12 @@ export function autoTextColor(backgroundColor) {
       cN[`${color}.L`] = Math.pow((cN[`${color}.L`] + 0.055) / 1.055, 2.4);
     }
   }
-  cN["L.tot"] =
+  cN['L.tot'] =
     0.2126 * cN[`red.L`] + 0.7152 * cN[`green.L`] + 0.0722 * cN[`blue.L`];
 
-  if (cN["L.tot"] > 0.179) {
-    return "000";
+  if (cN['L.tot'] > 0.179) {
+    return '000';
   } else {
-    return "FFF";
+    return 'FFF';
   }
 }

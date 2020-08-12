@@ -1,4 +1,4 @@
-import { LitElement, html, css } from "lit-element";
+import { LitElement, html } from 'lit-element';
 
 class NotFoundView extends LitElement {
   render() {
@@ -8,4 +8,4 @@ class NotFoundView extends LitElement {
     `;
   }
 }
-customElements.define("not-found-view", NotFoundView);
+customElements.define('not-found-view', NotFoundView);

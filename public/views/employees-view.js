@@ -1,9 +1,9 @@
-import { LitElement, html, css } from "lit-element";
-import "../components/employee-card.js";
-import "../components/edit-employee.js";
-import { nanoid } from "nanoid";
-import { randomAvataaarURL } from "../src/randomAvataaarURL";
-import { setDefaultShiftDist } from "../src/defaultShiftDist";
+import { LitElement, html, css } from 'lit-element';
+import '../components/employee-card.js';
+import '../components/edit-employee.js';
+import { nanoid } from 'nanoid';
+import { randomAvataaarURL } from '../src/randomAvataaarURL';
+import { setDefaultShiftDist } from '../src/defaultShiftDist';
 
 class EmployeesView extends LitElement {
   static get properties() {
@@ -20,24 +20,24 @@ class EmployeesView extends LitElement {
     super();
 
     this.editEmployee = false;
-    if (window.localStorage.getItem("definedEmployees") === null) {
+    if (window.localStorage.getItem('definedEmployees') === null) {
       this.employees = [];
     } else {
       this.employees = JSON.parse(
-        window.localStorage.getItem("definedEmployees")
+        window.localStorage.getItem('definedEmployees')
       );
     }
 
-    if (window.localStorage.getItem("definedShifts") === null) {
+    if (window.localStorage.getItem('definedShifts') === null) {
       this.shifts = [];
     } else {
-      this.shifts = JSON.parse(window.localStorage.getItem("definedShifts"));
+      this.shifts = JSON.parse(window.localStorage.getItem('definedShifts'));
     }
   }
 
   updated() {
     window.localStorage.setItem(
-      "definedEmployees",
+      'definedEmployees',
       JSON.stringify(this.employees)
     );
   }
@@ -49,13 +49,13 @@ class EmployeesView extends LitElement {
       ...this.employees,
       {
         id: newId,
-        name: "New Employee",
+        name: 'New Employee',
         plannedWorkingTime: 180,
         overtime: 0,
         consecutiveWorkingDays: {
           min: 3,
           max: 5,
-          prefered: 4,
+          preferred: 4,
         },
         minConsecutiveDaysOff: 2,
         shift: setDefaultShiftDist(this.shifts),
@@ -114,7 +114,7 @@ class EmployeesView extends LitElement {
             @close-me="${this.closeEditEmployee}"
             @update-me="${this.updateEmployee}"
           ></edit-employee>`
-        : ""}
+        : ''}
       <div class="cardWrapper">
         ${this.employees.map(
           (employee) =>
@@ -171,4 +171,4 @@ class EmployeesView extends LitElement {
   }
 }
 
-customElements.define("employees-view", EmployeesView);
+customElements.define('employees-view', EmployeesView);

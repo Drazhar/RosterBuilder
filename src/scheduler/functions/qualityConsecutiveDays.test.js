@@ -1,12 +1,12 @@
-import { qualityConsecutiveDays } from "./qualityConsecutiveDays";
+import { qualityConsecutiveDays } from './qualityConsecutiveDays';
 
-test("Consecutive Days off: Good", () => {
+test('Consecutive Days off: Good', () => {
   let result = qualityConsecutiveDays({
     information: {
       consecutiveWorkingDays: {
         min: 2,
         max: 5,
-        prefered: 4,
+        preferred: 4,
       },
       minConsecutiveDaysOff: 2,
     },
@@ -17,13 +17,13 @@ test("Consecutive Days off: Good", () => {
   expect(result[0]).toBeCloseTo(0);
 });
 
-test("Consecutive Days off: Bad", () => {
+test('Consecutive Days off: Bad', () => {
   let result = qualityConsecutiveDays({
     information: {
       consecutiveWorkingDays: {
         min: 2,
         max: 5,
-        prefered: 4,
+        preferred: 4,
       },
       minConsecutiveDaysOff: 2,
     },
@@ -33,13 +33,13 @@ test("Consecutive Days off: Bad", () => {
   expect(result[0]).toBeGreaterThan(0);
 });
 
-test("Consecutive Working Days: Below min", () => {
+test('Consecutive Working Days: Below min', () => {
   let result = qualityConsecutiveDays({
     information: {
       consecutiveWorkingDays: {
         min: 2,
         max: 5,
-        prefered: 4,
+        preferred: 4,
       },
       minConsecutiveDaysOff: 2,
     },
@@ -50,13 +50,13 @@ test("Consecutive Working Days: Below min", () => {
   expect(result[1]).toBeCloseTo(36);
 });
 
-test("Consecutive Working Days: Below prefered", () => {
+test('Consecutive Working Days: Below preferred', () => {
   let result = qualityConsecutiveDays({
     information: {
       consecutiveWorkingDays: {
         min: 2,
         max: 5,
-        prefered: 4,
+        preferred: 4,
       },
       minConsecutiveDaysOff: 2,
     },
@@ -71,7 +71,7 @@ test("Consecutive Working Days: Below prefered", () => {
       consecutiveWorkingDays: {
         min: 2,
         max: 5,
-        prefered: 4,
+        preferred: 4,
       },
       minConsecutiveDaysOff: 2,
     },
@@ -83,13 +83,13 @@ test("Consecutive Working Days: Below prefered", () => {
   expect(result[1]).toBeGreaterThan(0);
 });
 
-test("Consecutive Working Days: Above max", () => {
+test('Consecutive Working Days: Above max', () => {
   let result = qualityConsecutiveDays({
     information: {
       consecutiveWorkingDays: {
         min: 2,
         max: 5,
-        prefered: 4,
+        preferred: 4,
       },
       minConsecutiveDaysOff: 2,
     },
@@ -104,7 +104,7 @@ test("Consecutive Working Days: Above max", () => {
       consecutiveWorkingDays: {
         min: 2,
         max: 5,
-        prefered: 4,
+        preferred: 4,
       },
       minConsecutiveDaysOff: 2,
     },

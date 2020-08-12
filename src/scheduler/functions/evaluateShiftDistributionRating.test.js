@@ -1,6 +1,6 @@
-import { evaluateShiftDistributionRating } from "./evaluateShiftDistributionRating";
+import { evaluateShiftDistributionRating } from './evaluateShiftDistributionRating';
 
-test("Strange shift distributions", () => {
+test('Strange shift distributions', () => {
   let result = evaluateShiftDistributionRating({
     plannedDistribution: [0, 0, 1],
     worked: [0, 4, 0],
@@ -10,7 +10,7 @@ test("Strange shift distributions", () => {
   expect(result).toBeCloseTo(0);
 });
 
-test("Perfect distributions", () => {
+test('Perfect distributions', () => {
   expect(
     evaluateShiftDistributionRating({
       plannedDistribution: [0, 1, 1],
@@ -33,7 +33,7 @@ test("Perfect distributions", () => {
   ).toBe(0);
 });
 
-test("Okayisch distributions", () => {
+test('Acceptable distributions', () => {
   let result = evaluateShiftDistributionRating({
     plannedDistribution: [0, 2, 2, 1],
     worked: [0, 2, 1, 1],
@@ -63,7 +63,7 @@ test("Okayisch distributions", () => {
   expect(result).toBeLessThan(1);
 });
 
-test("Bad distributions", () => {
+test('Bad distributions', () => {
   let result = evaluateShiftDistributionRating({
     plannedDistribution: [0, 1, 1, 1],
     worked: [0, 3, 2, 1],

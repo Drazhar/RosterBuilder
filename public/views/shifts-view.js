@@ -1,8 +1,8 @@
-import { LitElement, html, css } from "lit-element";
-import { nanoid } from "nanoid";
-import "../components/shift-card";
-import "../components/edit-shift";
-import { autoColor } from "../src/autoColorPicker";
+import { LitElement, html, css } from 'lit-element';
+import { nanoid } from 'nanoid';
+import '../components/shift-card';
+import '../components/edit-shift';
+import { autoColor } from '../src/autoColorPicker';
 
 class ShiftsView extends LitElement {
   static get properties() {
@@ -18,15 +18,15 @@ class ShiftsView extends LitElement {
     super();
 
     this.editShift = false;
-    if (window.localStorage.getItem("definedShifts") === null) {
+    if (window.localStorage.getItem('definedShifts') === null) {
       this.shifts = [];
     } else {
-      this.shifts = JSON.parse(window.localStorage.getItem("definedShifts"));
+      this.shifts = JSON.parse(window.localStorage.getItem('definedShifts'));
     }
   }
 
   updated() {
-    window.localStorage.setItem("definedShifts", JSON.stringify(this.shifts));
+    window.localStorage.setItem('definedShifts', JSON.stringify(this.shifts));
   }
 
   addNewShift() {
@@ -35,7 +35,7 @@ class ShiftsView extends LitElement {
       ...this.shifts,
       {
         id: newId,
-        name: "New Shift",
+        name: 'New Shift',
         colors: autoColor(this.shifts),
         workingHours: 12,
         autoAssign: true,
@@ -93,7 +93,7 @@ class ShiftsView extends LitElement {
             @close-me="${this.closeEditShift}"
             @update-me="${this.updateShift}"
           ></edit-shift>`
-        : ""}
+        : ''}
       <div class="cardWrapper">
         ${this.shifts.map(
           (shift) =>
@@ -150,4 +150,4 @@ class ShiftsView extends LitElement {
   }
 }
 
-customElements.define("shifts-view", ShiftsView);
+customElements.define('shifts-view', ShiftsView);

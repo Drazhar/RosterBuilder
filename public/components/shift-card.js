@@ -1,4 +1,4 @@
-import { LitElement, html, css } from "lit-element";
+import { LitElement, html, css } from 'lit-element';
 
 class ShiftCard extends LitElement {
   static get properties() {
@@ -11,7 +11,7 @@ class ShiftCard extends LitElement {
   // Template for custom events
   removeThisShift(event) {
     this.dispatchEvent(
-      new CustomEvent("remove-me", {
+      new CustomEvent('remove-me', {
         detail: {
           id: this.shift.id,
         },
@@ -23,7 +23,7 @@ class ShiftCard extends LitElement {
 
   editThisShift() {
     this.dispatchEvent(
-      new CustomEvent("edit-me", {
+      new CustomEvent('edit-me', {
         detail: {
           id: this.shift.id,
         },
@@ -119,4 +119,4 @@ class ShiftCard extends LitElement {
   }
 }
 
-customElements.define("shift-card", ShiftCard);
+customElements.define('shift-card', ShiftCard);

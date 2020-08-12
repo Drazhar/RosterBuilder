@@ -1,5 +1,5 @@
-import { LitElement, html, css } from "lit-element";
-import { scheduleConverter } from "../src/scheduleConverter";
+import { LitElement, html, css } from 'lit-element';
+import { scheduleConverter } from '../src/scheduleConverter';
 
 class shiftSchedule extends LitElement {
   static get properties() {
@@ -15,14 +15,14 @@ class shiftSchedule extends LitElement {
 
     this.indexToDisplay = 0;
 
-    if (localStorage.getItem("lastSchedule") !== null) {
-      this.scheduleToDisplay = JSON.parse(localStorage.getItem("lastSchedule"));
+    if (localStorage.getItem('lastSchedule') !== null) {
+      this.scheduleToDisplay = JSON.parse(localStorage.getItem('lastSchedule'));
     } else {
       this.scheduleToDisplay = [
         [
           {
-            assignedShifts: [" "],
-            information: { name: "empty" },
+            assignedShifts: [' '],
+            information: { name: 'empty' },
             schedulingInformation: { hoursWorked: 0 },
             quality: { minConsecutiveDaysOffCheck: 0 },
           },
@@ -30,20 +30,20 @@ class shiftSchedule extends LitElement {
       ];
     }
 
-    if (window.localStorage.getItem("definedShifts") === null) {
+    if (window.localStorage.getItem('definedShifts') === null) {
       this.shifts = [];
     } else {
-      this.shifts = JSON.parse(window.localStorage.getItem("definedShifts"));
+      this.shifts = JSON.parse(window.localStorage.getItem('definedShifts'));
     }
   }
 
   async btnCreateSchedule() {
     const createdSchedule = await this.createSchedule();
-    if (createdSchedule.status === "success") {
+    if (createdSchedule.status === 'success') {
       console.log(createdSchedule.result);
       this.scheduleToDisplay = createdSchedule.result;
       localStorage.setItem(
-        "lastSchedule",
+        'lastSchedule',
         JSON.stringify(this.scheduleToDisplay)
       );
     }
@@ -64,15 +64,15 @@ class shiftSchedule extends LitElement {
   async createSchedule() {
     const data = {
       iterations: 100000,
-      employees: JSON.parse(window.localStorage.getItem("definedEmployees")),
+      employees: JSON.parse(window.localStorage.getItem('definedEmployees')),
       shifts: this.shifts,
     };
     const response = await fetch(
       // `${window.location.origin}/api/createSchedule`,
       `http://127.0.0.1:3000/api/createSchedule`,
       {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       }
     );
@@ -115,7 +115,7 @@ class shiftSchedule extends LitElement {
                                 (item) => item.id === assigned.value
                               )[0].colors.textColor
                             }`
-                          : ""}"
+                          : ''}"
                       >
                         ${this.shifts.filter(
                           (item) => item.id === assigned.value
@@ -123,9 +123,9 @@ class shiftSchedule extends LitElement {
                           ? this.shifts.filter(
                               (item) => item.id === assigned.value
                             )[0].name +
-                            " " +
+                            ' ' +
                             assigned.count
-                          : ""}
+                          : ''}
                       </td>
                     `;
                   })}
@@ -199,7 +199,7 @@ class shiftSchedule extends LitElement {
     return css`
       /* Table */
       * {
-        font-family: "Poppins", sans-serif;
+        font-family: 'Poppins', sans-serif;
       }
 
       .wrapper {
@@ -269,4 +269,4 @@ class shiftSchedule extends LitElement {
   }
 }
 
-customElements.define("shift-schedule", shiftSchedule);
+customElements.define('shift-schedule', shiftSchedule);

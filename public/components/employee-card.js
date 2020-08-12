@@ -1,4 +1,4 @@
-import { LitElement, html, css } from "lit-element";
+import { LitElement, html, css } from 'lit-element';
 
 class EmployeeCard extends LitElement {
   static get properties() {
@@ -11,7 +11,7 @@ class EmployeeCard extends LitElement {
   // Template for custom events
   removeThisEmployee(event) {
     this.dispatchEvent(
-      new CustomEvent("remove-me", {
+      new CustomEvent('remove-me', {
         detail: {
           id: this.employee.id,
         },
@@ -23,7 +23,7 @@ class EmployeeCard extends LitElement {
 
   editThisEmployee() {
     this.dispatchEvent(
-      new CustomEvent("edit-me", {
+      new CustomEvent('edit-me', {
         detail: {
           id: this.employee.id,
         },
@@ -93,4 +93,4 @@ class EmployeeCard extends LitElement {
   }
 }
 
-customElements.define("employee-card", EmployeeCard);
+customElements.define('employee-card', EmployeeCard);

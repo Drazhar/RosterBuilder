@@ -1,13 +1,13 @@
 const employeeInformationTemp = [
   {
     id: 1,
-    name: "Mila",
+    name: 'Mila',
     plannedWorkingTime: 216,
     overtime: 0,
     consecutiveWorkingDays: {
       min: 3,
       max: 5,
-      prefered: 4,
+      preferred: 4,
     },
     minConsecutiveDaysOff: 2,
     shift: {
@@ -16,13 +16,13 @@ const employeeInformationTemp = [
   },
   {
     id: 2,
-    name: "Philip",
+    name: 'Philip',
     plannedWorkingTime: 216,
     overtime: 0,
     consecutiveWorkingDays: {
       min: 3,
       max: 5,
-      prefered: 4,
+      preferred: 4,
     },
     minConsecutiveDaysOff: 2,
     shift: {
@@ -31,13 +31,13 @@ const employeeInformationTemp = [
   },
   {
     id: 3,
-    name: "Hans",
+    name: 'Hans',
     plannedWorkingTime: 216,
     overtime: 0,
     consecutiveWorkingDays: {
       min: 3,
       max: 5,
-      prefered: 4,
+      preferred: 4,
     },
     minConsecutiveDaysOff: 2,
     shift: {
@@ -46,13 +46,13 @@ const employeeInformationTemp = [
   },
   {
     id: 4,
-    name: "Andreas",
+    name: 'Andreas',
     plannedWorkingTime: 216,
     overtime: 0,
     consecutiveWorkingDays: {
       min: 3,
       max: 5,
-      prefered: 4,
+      preferred: 4,
     },
     minConsecutiveDaysOff: 2,
     shift: {
@@ -61,13 +61,13 @@ const employeeInformationTemp = [
   },
   {
     id: 5,
-    name: "Bernd",
+    name: 'Bernd',
     plannedWorkingTime: 216,
     overtime: 0,
     consecutiveWorkingDays: {
       min: 3,
       max: 5,
-      prefered: 4,
+      preferred: 4,
     },
     minConsecutiveDaysOff: 2,
     shift: {
@@ -78,24 +78,24 @@ const employeeInformationTemp = [
 
 const shiftInformationTemp = [
   {
-    name: " ",
+    name: ' ',
     workingHours: 0,
     autoAssign: true,
   },
   {
-    name: "D",
+    name: 'D',
     workingHours: 12,
     autoAssign: true,
     requiredEmployees: 1,
   },
   {
-    name: "N",
+    name: 'N',
     workingHours: 12,
     autoAssign: true,
     requiredEmployees: 1,
   },
   {
-    name: "T",
+    name: 'T',
     workingHours: 12,
     autoAssign: false,
     requiredEmployees: 1,

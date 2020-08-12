@@ -30,12 +30,12 @@ function qualityWorkingHours(employee) {
       difference = difference * 2;
     }
   } else if (employee.information.overtime > 0) {
-    // Employee has overtime, so it's okayisch to work less this period
+    // Employee has overtime, so it's acceptable to work less this period
     if (difference < 0 && -difference <= AllowedDeviation) {
       smallDeviation = true;
     }
   } else {
-    // Employee has negative overtime, so it's okayish to work more this period
+    // Employee has negative overtime, so it's acceptable to work more this period
     if (difference > 0 && difference <= AllowedDeviation) {
       smallDeviation = true;
     }

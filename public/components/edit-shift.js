@@ -1,5 +1,5 @@
-import { LitElement, html, css } from "lit-element";
-import { autoTextColor } from "../src/autoColorPicker";
+import { LitElement, html, css } from 'lit-element';
+import { autoTextColor } from '../src/autoColorPicker';
 
 class EditShift extends LitElement {
   static get properties() {
@@ -14,7 +14,7 @@ class EditShift extends LitElement {
   }
 
   sendCloseEvent() {
-    this.dispatchEvent(new CustomEvent("close-me", {}));
+    this.dispatchEvent(new CustomEvent('close-me', {}));
   }
 
   saveChanges(event) {
@@ -22,21 +22,21 @@ class EditShift extends LitElement {
 
     // Update the properties of this class
     this.shift.colors.backgroundColor = this.shadowRoot
-      .getElementById("color")
+      .getElementById('color')
       .value.toString()
       .substr(1);
     this.shift.colors.textColor = autoTextColor(
       this.shift.colors.backgroundColor
     );
-    this.shift.name = this.shadowRoot.getElementById("name").value;
-    this.shift.workingHours = this.shadowRoot.getElementById("hours").value;
+    this.shift.name = this.shadowRoot.getElementById('name').value;
+    this.shift.workingHours = this.shadowRoot.getElementById('hours').value;
     this.shift.requiredEmployees = this.shadowRoot.getElementById(
-      "requiredEmployees"
+      'requiredEmployees'
     ).value;
 
     // Dispatch event with this employee object to save it to the database or local storage
     this.dispatchEvent(
-      new CustomEvent("update-me", {
+      new CustomEvent('update-me', {
         detail: {
           shift: this.shift,
         },
@@ -188,4 +188,4 @@ class EditShift extends LitElement {
   }
 }
 
-customElements.define("edit-shift", EditShift);
+customElements.define('edit-shift', EditShift);
