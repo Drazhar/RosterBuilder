@@ -1,3 +1,6 @@
+# Untracked folders:
 node_modules
 static
-package-lock.json
+
+# Untracked files:
+*package-lock.json
