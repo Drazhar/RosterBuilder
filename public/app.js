@@ -8,7 +8,7 @@ import './src/routing';
 const runScheduler = require('./../src/scheduler/main');
 console.log(
   runScheduler(
-    10,
+    2,
     JSON.parse(window.localStorage.getItem('definedEmployees')),
     JSON.parse(window.localStorage.getItem('definedShifts'))
   )

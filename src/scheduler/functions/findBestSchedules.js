@@ -38,8 +38,8 @@ function findBestSchedules(createdSchedules) {
 
 function getParetoFront(createdSchedules) {
   const P = createdSchedules.sort((a, b) => {
-    if (a[0].target < b[0].target) {
-      //if (a[0].quality.totalHourDifference < b[0].quality.totalHourDifference) {
+    // if (a[0].target < b[0].target) {
+    if (a[0].quality.totalHourDifference < b[0].quality.totalHourDifference) {
       return -1;
     }
     return 1;
@@ -60,20 +60,28 @@ function kungAlgorithm(P) {
     if (B_ITEM[0].quality.minConsecutiveDaysOff !== 0) {
       continue;
     }
-    let isDominated = true;
+    let isDominated = false;
     for (const T_ITEM of T) {
+      let allWorse = [];
       for (const key in T_ITEM[0].quality) {
-        if (
-          key !== 'minConsecutiveDaysOff' &&
-          key !== 'consecutiveWorkingDays'
-        ) {
-          if (B_ITEM[0].quality[key] <= T_ITEM[0].quality[key]) {
-            isDominated = false;
-            break;
+        if (key !== 'minConsecutiveDaysOff') {
+          // console.log(`KEY: ${key}`);
+          // console.log(
+          //   `T: ${T_ITEM[0].quality[key]} B: ${B_ITEM[0].quality[key]}`
+          // );
+          if (B_ITEM[0].quality[key] >= T_ITEM[0].quality[key]) {
+            allWorse.push(true);
+          } else {
+            allWorse.push(false);
           }
         }
       }
-      if (!isDominated) {
+      // console.log(...allWorse);
+      if (allWorse.every((item) => item)) {
+        // console.log('is Dominated');
+        isDominated = true;
+      }
+      if (isDominated) {
         break;
       }
     }

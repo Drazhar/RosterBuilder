@@ -64,7 +64,7 @@ class shiftSchedule extends LitElement {
 
   async createSchedule() {
     const data = {
-      iterations: 1000,
+      iterations: 50000,
       employees: JSON.parse(window.localStorage.getItem('definedEmployees')),
       shifts: this.shifts,
     };
@@ -288,15 +288,15 @@ class shiftSchedule extends LitElement {
       data.push({
         x: schedule[0].quality.totalHourDifference,
         y: schedule[0].quality.shiftDistribution,
+        color: schedule[0].quality.consecutiveWorkingDays,
       });
     });
-
-    console.log(data);
 
     const width = 800;
     const height = 400;
 
     const chartArea = this.shadowRoot.getElementById('chart');
+    chartArea.innerHTML = ''; // delete old chart
     console.log('updating chart');
 
     // Create the chart itself
@@ -314,6 +314,10 @@ class shiftSchedule extends LitElement {
       .scaleLinear()
       .range([height, 0])
       .domain([0, d3.max(data, (d) => d.y)]);
+    const colorRating = d3
+      .scaleLinear()
+      .range([0, 255])
+      .domain([0, d3.max(data, (d) => d.color)]);
 
     // Dots there are
     svg
@@ -323,7 +327,8 @@ class shiftSchedule extends LitElement {
       .append('circle')
       .attr('r', 3)
       .attr('cx', (d) => x(d.x))
-      .attr('cy', (d) => y(d.y));
+      .attr('cy', (d) => y(d.y))
+      .attr('fill', (d) => `RGB(${colorRating(d.color)},0,0)`);
 
     // Creating the axis
     svg
