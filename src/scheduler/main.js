@@ -41,7 +41,6 @@ module.exports = function runScheduler(
     minConsecutiveDaysOff: 1,
     consecutiveWorkingDays: 0.2,
   };
-  let targetFunctions = [];
   let bestTargetFunction = Infinity;
   const numberOfDays = 30; // This should be set outside of the function later.
 
@@ -101,7 +100,7 @@ module.exports = function runScheduler(
     }
   }
 
-  return findBestSchedules(createdSchedules, bestRatings, bestTargetFunction);
+  return findBestSchedules(createdSchedules);
 };
 
 function assignEmployees(inputSchedule, day, shiftInformation) {

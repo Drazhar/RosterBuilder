@@ -1,4 +1,4 @@
-function findBestSchedules(createdSchedules, bestRatings, bestTargetFunction) {
+function findBestSchedules(createdSchedules) {
   // let createdSchedulesBest = [];
   // for (let i = 0; i < createdSchedules.length; i++) {
   //   if (
@@ -63,7 +63,10 @@ function kungAlgorithm(P) {
     let isDominated = true;
     for (const T_ITEM of T) {
       for (const key in T_ITEM[0].quality) {
-        if (key !== 'minConsecutiveDaysOff') {
+        if (
+          key !== 'minConsecutiveDaysOff' &&
+          key !== 'consecutiveWorkingDays'
+        ) {
           if (B_ITEM[0].quality[key] <= T_ITEM[0].quality[key]) {
             isDominated = false;
             break;

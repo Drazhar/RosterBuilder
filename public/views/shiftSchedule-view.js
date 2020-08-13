@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit-element';
 import { scheduleConverter } from '../src/scheduleConverter';
+import * as d3 from 'd3';
 
 class shiftSchedule extends LitElement {
   static get properties() {
@@ -191,6 +192,8 @@ class shiftSchedule extends LitElement {
         <p>Currently displayed: ${this.indexToDisplay + 1}</p>
         <button @click="${this.showNext}">Show next</button>
         <button @click="${this.showPrev}">Show prev</button>
+
+        <div id="chart"></div>
       </div>
     `;
   }
@@ -265,7 +268,36 @@ class shiftSchedule extends LitElement {
         background-color: blue;
         color: white;
       }
+
+      #chart {
+        width: 80vw;
+        height: 300px;
+        background-color: white;
+      }
     `;
+  }
+
+  updated() {
+    this.createChart();
+  }
+
+  createChart() {
+    const chartArea = this.shadowRoot.getElementById('chart');
+    console.log('upddating chart');
+    const svg = d3
+      .select(chartArea)
+      .append('svg')
+      .style('width', '100%')
+      .style('height', '100%');
+    svg
+      .selectAll('dot')
+      .data(this.scheduleToDisplay)
+      .enter()
+      .append('circle')
+      .attr('cx', (d) => d[0].quality.totalHourDifference / 50)
+      .attr('cy', (d) => d[0].quality.shiftDistribution)
+      .attr('r', 2.5)
+      .style('fill', 'black');
   }
 }
 
