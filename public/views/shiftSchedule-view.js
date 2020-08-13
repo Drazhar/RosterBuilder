@@ -64,7 +64,7 @@ class shiftSchedule extends LitElement {
 
   async createSchedule() {
     const data = {
-      iterations: 100,
+      iterations: 1000,
       employees: JSON.parse(window.localStorage.getItem('definedEmployees')),
       shifts: this.shifts,
     };
@@ -188,12 +188,11 @@ class shiftSchedule extends LitElement {
           </tbody>
         </table>
         <button @click="${this.btnCreateSchedule}">Create new roster</button>
+        <div id="chart"></div>
         <p>Number of good schedules: ${this.scheduleToDisplay.length}</p>
         <p>Currently displayed: ${this.indexToDisplay + 1}</p>
         <button @click="${this.showNext}">Show next</button>
         <button @click="${this.showPrev}">Show prev</button>
-
-        <div id="chart"></div>
       </div>
     `;
   }
@@ -270,9 +269,10 @@ class shiftSchedule extends LitElement {
       }
 
       #chart {
-        width: 80vw;
-        height: 300px;
+        width: 800px;
+        height: 400px;
         background-color: white;
+        border: 1px solid black;
       }
     `;
   }
@@ -282,22 +282,55 @@ class shiftSchedule extends LitElement {
   }
 
   createChart() {
+    // Extract the data into clean arrays
+    let data = [];
+    this.scheduleToDisplay.forEach((schedule) => {
+      data.push({
+        x: schedule[0].quality.totalHourDifference,
+        y: schedule[0].quality.shiftDistribution,
+      });
+    });
+
+    console.log(data);
+
+    const width = 800;
+    const height = 400;
+
     const chartArea = this.shadowRoot.getElementById('chart');
-    console.log('upddating chart');
+    console.log('updating chart');
+
+    // Create the chart itself
     const svg = d3
       .select(chartArea)
       .append('svg')
-      .style('width', '100%')
-      .style('height', '100%');
+      .attr('width', width)
+      .attr('height', height);
+    // Scales
+    const x = d3
+      .scaleLinear()
+      .range([0, width])
+      .domain([0, d3.max(data, (d) => d.x)]);
+    const y = d3
+      .scaleLinear()
+      .range([height, 0])
+      .domain([0, d3.max(data, (d) => d.y)]);
+
+    // Dots there are
     svg
       .selectAll('dot')
-      .data(this.scheduleToDisplay)
+      .data(data)
       .enter()
       .append('circle')
-      .attr('cx', (d) => d[0].quality.totalHourDifference / 50)
-      .attr('cy', (d) => d[0].quality.shiftDistribution)
-      .attr('r', 2.5)
-      .style('fill', 'black');
+      .attr('r', 3)
+      .attr('cx', (d) => x(d.x))
+      .attr('cy', (d) => y(d.y));
+
+    // Creating the axis
+    svg
+      .append('g')
+      .attr('transform', 'translate(0,' + height + ')')
+      .call(d3.axisTop(x).ticks(10));
+    svg.append('svg').call(d3.axisRight(y).ticks(5));
   }
 }
 
