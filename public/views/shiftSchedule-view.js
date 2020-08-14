@@ -64,7 +64,7 @@ class shiftSchedule extends LitElement {
 
   async createSchedule() {
     const data = {
-      iterations: 50000,
+      iterations: 100000,
       employees: JSON.parse(window.localStorage.getItem('definedEmployees')),
       shifts: this.shifts,
     };
@@ -189,8 +189,8 @@ class shiftSchedule extends LitElement {
         </table>
         <button @click="${this.btnCreateSchedule}">Create new roster</button>
         <div id="chart"></div>
-        <p>Number of good schedules: ${this.scheduleToDisplay.length}</p>
-        <p>Currently displayed: ${this.indexToDisplay + 1}</p>
+        <p>Number of good schedules: ${this.scheduleToDisplay.length - 1}</p>
+        <p>Currently displayed: ${this.indexToDisplay}</p>
         <button @click="${this.showNext}">Show next</button>
         <button @click="${this.showPrev}">Show prev</button>
       </div>
@@ -325,10 +325,12 @@ class shiftSchedule extends LitElement {
       .data(data)
       .enter()
       .append('circle')
-      .attr('r', 3)
+      .attr('r', 4)
       .attr('cx', (d) => x(d.x))
       .attr('cy', (d) => y(d.y))
-      .attr('fill', (d) => `RGB(${colorRating(d.color)},0,0)`);
+      .attr('fill', (d) => `RGB(${colorRating(d.color)},0,0)`)
+      .append('svg:title')
+      .text((d, i) => `index: ${i} x: ${d.x}   y: ${d.y}`);
 
     // Creating the axis
     svg

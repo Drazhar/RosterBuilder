@@ -35,13 +35,13 @@ module.exports = function runScheduler(
     minConsecutiveDaysOff: Infinity,
     consecutiveWorkingDays: Infinity,
   };
-  let targetWeights = {
-    totalHourDifference: 1,
-    shiftDistribution: 0.2,
-    minConsecutiveDaysOff: 1,
-    consecutiveWorkingDays: 0.2,
-  };
-  let bestTargetFunction = Infinity;
+  // let targetWeights = {
+  //   totalHourDifference: 1,
+  //   shiftDistribution: 0.2,
+  //   minConsecutiveDaysOff: 1,
+  //   consecutiveWorkingDays: 0.2,
+  // };
+  // let bestTargetFunction = Infinity;
   const numberOfDays = 30; // This should be set outside of the function later.
 
   for (let i = 0; i < iterations; i++) {
@@ -86,18 +86,22 @@ module.exports = function runScheduler(
 
     // Store the best value of each criteria for later filtering
     for (const key in bestRatings) {
-      // Build the targetProduct
-      createdSchedules[i][0].target *=
-        (createdSchedules[i][0].quality[key] + 1) ** targetWeights[key];
+      // Round all quality values
+      createdSchedules[i][0].quality[key] =
+        Math.round(createdSchedules[i][0].quality[key] * 1000) / 1000;
+
+      // // Build the targetProduct
+      // createdSchedules[i][0].target *=
+      //   (createdSchedules[i][0].quality[key] + 1) ** targetWeights[key];
 
       // Find the best ratings
       if (createdSchedules[i][0].quality[key] < bestRatings[key]) {
         bestRatings[key] = createdSchedules[i][0].quality[key];
       }
     }
-    if (createdSchedules[i][0].target < bestTargetFunction) {
-      bestTargetFunction = createdSchedules[i][0].target;
-    }
+    // if (createdSchedules[i][0].target < bestTargetFunction) {
+    //   bestTargetFunction = createdSchedules[i][0].target;
+    // }
   }
 
   return findBestSchedules(createdSchedules);
