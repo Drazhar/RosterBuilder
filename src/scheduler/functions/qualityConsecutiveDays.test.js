@@ -159,6 +159,5 @@ test('Occuring Error during development', () => {
     ],
   });
 
-  console.log(result);
   expect(result[0]).toBeGreaterThan(0);
 });

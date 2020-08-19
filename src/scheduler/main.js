@@ -7,10 +7,42 @@ const {
 } = require('./functions/qualityConsecutiveDays');
 const { findBestSchedules } = require('./functions/findBestSchedules');
 
-module.exports = function runScheduler(
+function multipleScheduler(
   iterations = 1,
   employeeInformation,
   shiftInformation
+) {
+  let result = [];
+
+  console.time('calc');
+  for (let i = 0; i < 10; i++) {
+    result = runScheduler(
+      iterations,
+      [...employeeInformation],
+      [...shiftInformation],
+      [...result]
+    );
+    console.log(`${i}. Number of Results: ${result.length}`);
+  }
+  console.timeEnd('calc');
+  // Replace numbers with names for better overview
+  result.forEach((schedule) => {
+    schedule.forEach((employee, i) => {
+      employee.assignedShifts.forEach((shift, j) => {
+        schedule[i].assignedShifts[j] =
+          employee.schedulingInformation.shift.map[shift];
+      });
+    });
+  });
+
+  return result;
+}
+
+function runScheduler(
+  iterations = 1,
+  employeeInformation,
+  shiftInformation,
+  lastBest = []
 ) {
   convertToNumbersShiftsObject(shiftInformation); // Converts all strings to numbers which should be numbers
   convertToNumbersEmployeeObject(employeeInformation); // Converts all strings to numbers
@@ -35,14 +67,6 @@ module.exports = function runScheduler(
     minConsecutiveDaysOff: Infinity,
     consecutiveWorkingDays: Infinity,
   };
-  let targetWeights = {
-    totalHourDifference: 1,
-    shiftDistribution: 0.2,
-    minConsecutiveDaysOff: 1,
-    consecutiveWorkingDays: 0.2,
-  };
-  let targetFunctions = [];
-  let bestTargetFunction = Infinity;
   const numberOfDays = 30; // This should be set outside of the function later.
 
   for (let i = 0; i < iterations; i++) {
@@ -53,17 +77,7 @@ module.exports = function runScheduler(
       assignEmployees(createdSchedules[i], currentDay, shiftInformation);
     }
 
-    // Evaluate result
-    /* Concept for the quality rating: At the core each quality rating should be
-    in a range from 0 to 1 for an acceptable quality and then exponentially get
-    larger. During the creation of the quality ratings an array is created which
-    stores all schedules where all quality ratings are between 0 and 1 for
-    further evaluation. Also there is an combined target function for one
-    overall criteria (for example the product of all criteria with a weighting
-    factor). If the length of the best schedules array is to small, the complete
-    array of all results has to be sorted the get the 10 best candidates.
-    */
-
+    // Evaluate results
     createdSchedules[i].forEach((employee) => {
       // Evaluate the quality for worked hours vs planned hours
       createdSchedules[i][0].quality.totalHourDifference += qualityWorkingHours(
@@ -87,22 +101,23 @@ module.exports = function runScheduler(
 
     // Store the best value of each criteria for later filtering
     for (const key in bestRatings) {
-      // Build the targetProduct
-      createdSchedules[i][0].target *=
-        (createdSchedules[i][0].quality[key] + 1) ** targetWeights[key];
+      // Round all quality values
+      createdSchedules[i][0].quality[key] =
+        Math.round(createdSchedules[i][0].quality[key] * 1000) / 1000;
 
       // Find the best ratings
       if (createdSchedules[i][0].quality[key] < bestRatings[key]) {
         bestRatings[key] = createdSchedules[i][0].quality[key];
       }
     }
-    if (createdSchedules[i][0].target < bestTargetFunction) {
-      bestTargetFunction = createdSchedules[i][0].target;
-    }
   }
 
-  return findBestSchedules(createdSchedules, bestRatings, bestTargetFunction);
-};
+  if (lastBest.length > 0) {
+    createdSchedules.push(...lastBest);
+  }
+
+  return findBestSchedules(createdSchedules);
+}
 
 function assignEmployees(inputSchedule, day, shiftInformation) {
   for (
@@ -226,7 +241,10 @@ function obtainInformation(inputSchedule, shiftInformation) {
     }
 
     // Distribute shifts
-    for (let i = 1; i < shiftInformation.length - 1; i++) {
+    for (let i = 1; i < shiftInformation.length; i++) {
+      // console.log(
+      //   `${employee.information.name} ${i} Dist: ${employee.schedulingInformation.shift.plannedDistribution[i]}`
+      // );
       if (employee.schedulingInformation.shift.plannedDistribution[i] === 0) {
         employee.schedulingInformation.possibleShifts[i] = 0;
       }
@@ -437,3 +455,5 @@ function checkIfEmployeeInformationContainsAllShifts(
     });
   });
 }
+
+module.exports = { runScheduler, multipleScheduler };

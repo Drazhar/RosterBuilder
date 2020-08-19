@@ -14,7 +14,7 @@ function qualityConsecutiveDays(employee) {
 
   let currentDaysOff = 0;
   let currentDaysWorking = 0;
-  employee.assignedShifts.forEach((workShift) => {
+  employee.assignedShifts.forEach((workShift, index) => {
     // This part is for minConsecutiveDaysOff
     if (workShift === 0) {
       currentDaysOff++;
@@ -28,6 +28,14 @@ function qualityConsecutiveDays(employee) {
       currentDaysOff !== 0
     ) {
       // Switched from at least one day off to working
+      resultConsecutiveDaysOff++;
+    } else if (
+      workShift !== 0 &&
+      index > 0 &&
+      workShift !== employee.assignedShifts[index - 1] &&
+      employee.assignedShifts[index - 1] !== 0
+    ) {
+      // Switched from one shift to another without a day off
       resultConsecutiveDaysOff++;
     } else if (workShift === 0 && currentDaysWorking !== 0) {
       // Switched from working to at least a day off

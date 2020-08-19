@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit-element';
 import { scheduleConverter } from '../src/scheduleConverter';
+import * as d3 from 'd3';
 
 class shiftSchedule extends LitElement {
   static get properties() {
@@ -49,6 +50,10 @@ class shiftSchedule extends LitElement {
     }
   }
 
+  showIndex(index) {
+    this.indexToDisplay = index;
+  }
+
   showNext() {
     if (this.indexToDisplay < this.scheduleToDisplay.length - 1) {
       this.indexToDisplay++;
@@ -63,7 +68,7 @@ class shiftSchedule extends LitElement {
 
   async createSchedule() {
     const data = {
-      iterations: 100000,
+      iterations: 1000,
       employees: JSON.parse(window.localStorage.getItem('definedEmployees')),
       shifts: this.shifts,
     };
@@ -187,8 +192,9 @@ class shiftSchedule extends LitElement {
           </tbody>
         </table>
         <button @click="${this.btnCreateSchedule}">Create new roster</button>
-        <p>Number of good schedules: ${this.scheduleToDisplay.length}</p>
-        <p>Currently displayed: ${this.indexToDisplay + 1}</p>
+        <div id="chart"></div>
+        <p>Number of good schedules: ${this.scheduleToDisplay.length - 1}</p>
+        <p>Currently displayed: ${this.indexToDisplay}</p>
         <button @click="${this.showNext}">Show next</button>
         <button @click="${this.showPrev}">Show prev</button>
       </div>
@@ -265,7 +271,93 @@ class shiftSchedule extends LitElement {
         background-color: blue;
         color: white;
       }
+
+      #chart {
+        width: 800px;
+        height: 400px;
+        background-color: white;
+        border: 1px solid black;
+      }
+
+      .chartPoint:hover {
+        cursor: pointer;
+        fill: rgb(18, 170, 236);
+      }
     `;
+  }
+
+  updated() {
+    this.createChart();
+  }
+
+  createChart() {
+    // Extract the data into clean arrays
+    let data = [];
+    let id = 0;
+    this.scheduleToDisplay.forEach((schedule) => {
+      data.push({
+        id,
+        x: schedule[0].quality.totalHourDifference,
+        y: schedule[0].quality.shiftDistribution,
+        color: schedule[0].quality.consecutiveWorkingDays,
+      });
+      id++;
+    });
+
+    const width = 800;
+    const height = 400;
+
+    const chartArea = this.shadowRoot.getElementById('chart');
+    chartArea.innerHTML = ''; // delete old chart
+    console.log('updating chart');
+
+    // Create the chart itself
+    const svg = d3
+      .select(chartArea)
+      .append('svg')
+      .attr('width', width)
+      .attr('height', height);
+    // Scales
+    const x = d3
+      .scaleLinear()
+      .range([0, width])
+      .domain([0, d3.max(data, (d) => d.x)]);
+    const y = d3
+      .scaleLinear()
+      .range([height, 0])
+      .domain([0, d3.max(data, (d) => d.y)]);
+    const colorRating = d3
+      .scaleLinear()
+      .range([0, 255])
+      .domain([0, d3.max(data, (d) => d.color)]);
+
+    // Dots there are
+    svg
+      .selectAll('dot')
+      .data(data)
+      .enter()
+      .append('circle')
+      .attr('r', (d) => (d.id === this.indexToDisplay ? 8 : 5))
+      .attr('cx', (d) => x(d.x))
+      .attr('cy', (d) => y(d.y))
+      .attr('fill', (d) =>
+        d.id === this.indexToDisplay
+          ? `RGB(18, 170, 236)`
+          : `RGB(${colorRating(d.color)},0,0)`
+      )
+      .on('click', (d, i) => {
+        this.showIndex(i);
+      })
+      .attr('class', 'chartPoint')
+      .append('svg:title')
+      .text((d, i) => `index: ${i} x: ${d.x}   y: ${d.y}`);
+
+    // Creating the axis
+    svg
+      .append('g')
+      .attr('transform', 'translate(0,' + height + ')')
+      .call(d3.axisTop(x).ticks(10));
+    svg.append('svg').call(d3.axisRight(y).ticks(5));
   }
 }
 

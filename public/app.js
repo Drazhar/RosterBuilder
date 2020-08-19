@@ -5,9 +5,9 @@ import './style.scss';
 import './src/routing';
 
 // Testing the scheduler
-const runScheduler = require('./../src/scheduler/main');
+const { multipleScheduler } = require('./../src/scheduler/main');
 console.log(
-  runScheduler(
+  multipleScheduler(
     10,
     JSON.parse(window.localStorage.getItem('definedEmployees')),
     JSON.parse(window.localStorage.getItem('definedShifts'))
