@@ -24,11 +24,11 @@ function qualityWorkingHours(employee) {
 
   if (employee.information.overtime === 0) {
     // Employee has no overtime
-    if (Math.abs(difference) <= AllowedDeviation) {
-      smallDeviation = true;
-      // Slightly worsen the result to consider employees with overtime over overtime 0
-      difference = difference * 2;
-    }
+    // if (Math.abs(difference) <= AllowedDeviation) {
+    //   smallDeviation = true;
+    //   // Slightly worsen the result to consider employees with overtime over overtime 0
+    //   difference = difference * 2;
+    // }
   } else if (employee.information.overtime > 0) {
     // Employee has overtime, so it's acceptable to work less this period
     if (difference < 0 && -difference <= AllowedDeviation) {

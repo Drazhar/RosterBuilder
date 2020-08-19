@@ -1,17 +1,5 @@
 function findBestSchedules(createdSchedules) {
-  let createdSchedulesBest = getParetoFront(createdSchedules);
-
-  // // Replace numbers with names for better overview
-  createdSchedulesBest.forEach((schedule) => {
-    schedule.forEach((employee, i) => {
-      employee.assignedShifts.forEach((shift, j) => {
-        schedule[i].assignedShifts[j] =
-          employee.schedulingInformation.shift.map[shift];
-      });
-    });
-  });
-
-  return createdSchedulesBest;
+  return getParetoFront(createdSchedules);
 }
 
 function getParetoFront(P) {

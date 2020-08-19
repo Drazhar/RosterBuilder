@@ -50,6 +50,10 @@ class shiftSchedule extends LitElement {
     }
   }
 
+  showIndex(index) {
+    this.indexToDisplay = index;
+  }
+
   showNext() {
     if (this.indexToDisplay < this.scheduleToDisplay.length - 1) {
       this.indexToDisplay++;
@@ -64,7 +68,7 @@ class shiftSchedule extends LitElement {
 
   async createSchedule() {
     const data = {
-      iterations: 100000,
+      iterations: 1000,
       employees: JSON.parse(window.localStorage.getItem('definedEmployees')),
       shifts: this.shifts,
     };
@@ -274,6 +278,11 @@ class shiftSchedule extends LitElement {
         background-color: white;
         border: 1px solid black;
       }
+
+      .chartPoint:hover {
+        cursor: pointer;
+        fill: rgb(18, 170, 236);
+      }
     `;
   }
 
@@ -284,12 +293,15 @@ class shiftSchedule extends LitElement {
   createChart() {
     // Extract the data into clean arrays
     let data = [];
+    let id = 0;
     this.scheduleToDisplay.forEach((schedule) => {
       data.push({
+        id,
         x: schedule[0].quality.totalHourDifference,
         y: schedule[0].quality.shiftDistribution,
         color: schedule[0].quality.consecutiveWorkingDays,
       });
+      id++;
     });
 
     const width = 800;
@@ -325,10 +337,18 @@ class shiftSchedule extends LitElement {
       .data(data)
       .enter()
       .append('circle')
-      .attr('r', 4)
+      .attr('r', (d) => (d.id === this.indexToDisplay ? 8 : 5))
       .attr('cx', (d) => x(d.x))
       .attr('cy', (d) => y(d.y))
-      .attr('fill', (d) => `RGB(${colorRating(d.color)},0,0)`)
+      .attr('fill', (d) =>
+        d.id === this.indexToDisplay
+          ? `RGB(18, 170, 236)`
+          : `RGB(${colorRating(d.color)},0,0)`
+      )
+      .on('click', (d, i) => {
+        this.showIndex(i);
+      })
+      .attr('class', 'chartPoint')
       .append('svg:title')
       .text((d, i) => `index: ${i} x: ${d.x}   y: ${d.y}`);
 
