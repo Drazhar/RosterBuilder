@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit-element';
 import { scheduleConverter } from '../src/scheduleConverter';
 import * as d3 from 'd3';
+import { findIndexOfBest } from '../src/findIndexOfBest';
 
 class shiftSchedule extends LitElement {
   static get properties() {
@@ -79,12 +80,13 @@ class shiftSchedule extends LitElement {
         );
       }
       isFirst = false;
+      this.indexToDisplay = findIndexOfBest(this.scheduleToDisplay);
     }
   }
 
   async createSchedule(lastBest) {
     const data = {
-      iterations: 50000,
+      iterations: 10000,
       employees: JSON.parse(window.localStorage.getItem('definedEmployees')),
       shifts: this.shifts,
       lastBest,
