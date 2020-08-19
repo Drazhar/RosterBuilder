@@ -1,4 +1,5 @@
-export function scheduleConverter(plan) {
+export function scheduleConverter(plan, shifts) {
+  shiftNumbersToNames(plan, shifts);
   let result = [];
   plan.forEach((element) => {
     if (
@@ -15,4 +16,16 @@ export function scheduleConverter(plan) {
     }
   });
   return result;
+}
+
+function shiftNumbersToNames(plan, shifts) {
+  for (let i = 0; i < plan.length; i++) {
+    if (typeof plan[i] == 'number') {
+      if (plan[i] == 0) {
+        plan[i] = ' ';
+      } else {
+        plan[i] = shifts[plan[i] - 1].id;
+      }
+    }
+  }
 }

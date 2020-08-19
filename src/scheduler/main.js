@@ -7,6 +7,7 @@ const {
 } = require('./functions/qualityConsecutiveDays');
 const { findBestSchedules } = require('./functions/findBestSchedules');
 
+/*
 function multipleScheduler(
   iterations = 1,
   employeeInformation,
@@ -37,6 +38,7 @@ function multipleScheduler(
 
   return result;
 }
+*/
 
 function runScheduler(
   iterations = 1,
@@ -456,4 +458,4 @@ function checkIfEmployeeInformationContainsAllShifts(
   });
 }
 
-module.exports = { runScheduler, multipleScheduler };
+module.exports = { runScheduler };

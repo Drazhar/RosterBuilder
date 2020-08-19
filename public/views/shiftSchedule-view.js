@@ -8,6 +8,7 @@ class shiftSchedule extends LitElement {
       scheduleToDisplay: { type: Array },
       shifts: { type: Array },
       indexToDisplay: { type: Number },
+      isCreating: { type: Boolean },
     };
   }
 
@@ -15,6 +16,7 @@ class shiftSchedule extends LitElement {
     super();
 
     this.indexToDisplay = 0;
+    this.isCreating = 0;
 
     if (localStorage.getItem('lastSchedule') !== null) {
       this.scheduleToDisplay = JSON.parse(localStorage.getItem('lastSchedule'));
@@ -38,18 +40,6 @@ class shiftSchedule extends LitElement {
     }
   }
 
-  async btnCreateSchedule() {
-    const createdSchedule = await this.createSchedule();
-    if (createdSchedule.status === 'success') {
-      console.log(createdSchedule.result);
-      this.scheduleToDisplay = createdSchedule.result;
-      localStorage.setItem(
-        'lastSchedule',
-        JSON.stringify(this.scheduleToDisplay)
-      );
-    }
-  }
-
   showIndex(index) {
     this.indexToDisplay = index;
   }
@@ -66,21 +56,44 @@ class shiftSchedule extends LitElement {
     }
   }
 
-  async createSchedule() {
+  btnStopCreate() {
+    this.isCreating = false;
+  }
+
+  async btnCreateSchedule() {
+    this.isCreating = true;
+    let isFirst = true;
+    while (this.isCreating) {
+      let lastBest = [];
+      if (!isFirst) {
+        lastBest = this.scheduleToDisplay;
+      }
+
+      const createdSchedule = await this.createSchedule(lastBest);
+      if (createdSchedule.status === 'success') {
+        // console.log(createdSchedule.result);
+        this.scheduleToDisplay = createdSchedule.result;
+        localStorage.setItem(
+          'lastSchedule',
+          JSON.stringify(this.scheduleToDisplay)
+        );
+      }
+      isFirst = false;
+    }
+  }
+
+  async createSchedule(lastBest) {
     const data = {
-      iterations: 1000,
+      iterations: 50000,
       employees: JSON.parse(window.localStorage.getItem('definedEmployees')),
       shifts: this.shifts,
+      lastBest,
     };
-    const response = await fetch(
-      // `${window.location.origin}/api/createSchedule`,
-      `http://127.0.0.1:3000/api/createSchedule`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      }
-    );
+    const response = await fetch(`http://127.0.0.1:3000/api/createSchedule`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
     const json = await response.json();
     return json;
   }
@@ -104,36 +117,38 @@ class shiftSchedule extends LitElement {
               return html`
                 <tr>
                   <th class="employeeNames">${item.information.name}</th>
-                  ${scheduleConverter(item.assignedShifts).map((assigned) => {
-                    return html`
-                      <td
-                        colspan=${assigned.count}
-                        style="${this.shifts.filter(
-                          (item) => item.id === assigned.value
-                        ).length > 0
-                          ? `background-color:#${
-                              this.shifts.filter(
+                  ${scheduleConverter(item.assignedShifts, this.shifts).map(
+                    (assigned) => {
+                      return html`
+                        <td
+                          colspan=${assigned.count}
+                          style="${this.shifts.filter(
+                            (item) => item.id === assigned.value
+                          ).length > 0
+                            ? `background-color:#${
+                                this.shifts.filter(
+                                  (item) => item.id === assigned.value
+                                )[0].colors.backgroundColor
+                              }; color:#${
+                                this.shifts.filter(
+                                  (item) => item.id === assigned.value
+                                )[0].colors.textColor
+                              }`
+                            : ''}"
+                        >
+                          ${this.shifts.filter(
+                            (item) => item.id === assigned.value
+                          ).length > 0
+                            ? this.shifts.filter(
                                 (item) => item.id === assigned.value
-                              )[0].colors.backgroundColor
-                            }; color:#${
-                              this.shifts.filter(
-                                (item) => item.id === assigned.value
-                              )[0].colors.textColor
-                            }`
-                          : ''}"
-                      >
-                        ${this.shifts.filter(
-                          (item) => item.id === assigned.value
-                        ).length > 0
-                          ? this.shifts.filter(
-                              (item) => item.id === assigned.value
-                            )[0].name +
-                            ' ' +
-                            assigned.count
-                          : ''}
-                      </td>
-                    `;
-                  })}
+                              )[0].name +
+                              ' ' +
+                              assigned.count
+                            : ''}
+                        </td>
+                      `;
+                    }
+                  )}
                   <td>
                     ${item.schedulingInformation.hoursWorked}
                   </td>
@@ -191,7 +206,12 @@ class shiftSchedule extends LitElement {
             </tr>
           </tbody>
         </table>
-        <button @click="${this.btnCreateSchedule}">Create new roster</button>
+        <div>
+          <button @click="${this.btnCreateSchedule}">
+            Start creating roster
+          </button>
+          <button @click="${this.btnStopCreate}">Stop creating</button>
+        </div>
         <div id="chart"></div>
         <p>Number of good schedules: ${this.scheduleToDisplay.length - 1}</p>
         <p>Currently displayed: ${this.indexToDisplay}</p>
