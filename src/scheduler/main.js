@@ -7,37 +7,6 @@ const {
 } = require('./functions/qualityConsecutiveDays');
 const { findBestSchedules } = require('./functions/findBestSchedules');
 
-function multipleScheduler(
-  iterations = 1,
-  employeeInformation,
-  shiftInformation
-) {
-  let result = [];
-
-  console.time('calc');
-  for (let i = 0; i < 10; i++) {
-    result = runScheduler(
-      iterations,
-      [...employeeInformation],
-      [...shiftInformation],
-      [...result]
-    );
-    console.log(`${i}. Number of Results: ${result.length}`);
-  }
-  console.timeEnd('calc');
-  // Replace numbers with names for better overview
-  result.forEach((schedule) => {
-    schedule.forEach((employee, i) => {
-      employee.assignedShifts.forEach((shift, j) => {
-        schedule[i].assignedShifts[j] =
-          employee.schedulingInformation.shift.map[shift];
-      });
-    });
-  });
-
-  return result;
-}
-
 function runScheduler(
   iterations = 1,
   employeeInformation,
@@ -66,6 +35,12 @@ function runScheduler(
     shiftDistribution: Infinity,
     minConsecutiveDaysOff: Infinity,
     consecutiveWorkingDays: Infinity,
+  };
+  let targetWeights = {
+    totalHourDifference: 1,
+    shiftDistribution: 0.2,
+    minConsecutiveDaysOff: 1,
+    consecutiveWorkingDays: 0.2,
   };
   const numberOfDays = 30; // This should be set outside of the function later.
 
@@ -104,6 +79,10 @@ function runScheduler(
       // Round all quality values
       createdSchedules[i][0].quality[key] =
         Math.round(createdSchedules[i][0].quality[key] * 1000) / 1000;
+
+      // Build the targetProduct
+      createdSchedules[i][0].target *=
+        (createdSchedules[i][0].quality[key] + 1) ** targetWeights[key];
 
       // Find the best ratings
       if (createdSchedules[i][0].quality[key] < bestRatings[key]) {
@@ -456,4 +435,4 @@ function checkIfEmployeeInformationContainsAllShifts(
   });
 }
 
-module.exports = { runScheduler, multipleScheduler };
+module.exports = { runScheduler };

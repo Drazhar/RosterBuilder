@@ -1,10 +1,11 @@
 const { parentPort, workerData } = require('worker_threads');
-const { multipleScheduler } = require('./../scheduler/main');
+const { runScheduler } = require('./../scheduler/main');
 
 parentPort.postMessage(
-  multipleScheduler(
+  runScheduler(
     workerData.iterations,
     workerData.employees,
-    workerData.shifts
+    workerData.shifts,
+    workerData.lastBest
   )
 );
