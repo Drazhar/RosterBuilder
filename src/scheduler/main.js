@@ -6,11 +6,13 @@ const {
   qualityConsecutiveDays,
 } = require('./functions/qualityConsecutiveDays');
 const { findBestSchedules } = require('./functions/findBestSchedules');
+const { getQualityWeekends } = require('./functions/qualityWeekends');
 
 function runScheduler(
   iterations = 1,
   employeeInformation,
   shiftInformation,
+  dateArray,
   lastBest = []
 ) {
   convertToNumbersShiftsObject(shiftInformation); // Converts all strings to numbers which should be numbers
@@ -35,14 +37,18 @@ function runScheduler(
     shiftDistribution: Infinity,
     minConsecutiveDaysOff: Infinity,
     consecutiveWorkingDays: Infinity,
+    weekendDistribution: Infinity,
+    weekendNonstop: Infinity,
   };
   let targetWeights = {
     totalHourDifference: 1,
     shiftDistribution: 0.2,
     minConsecutiveDaysOff: 1,
     consecutiveWorkingDays: 0.2,
+    weekendDistribution: 0.5,
+    weekendNonstop: 1,
   };
-  const numberOfDays = 30; // This should be set outside of the function later.
+  const numberOfDays = dateArray.length; // This should be set outside of the function later.
 
   for (let i = 0; i < iterations; i++) {
     createdSchedules.push(initializeSchedule(employeeInformation));
@@ -73,6 +79,16 @@ function runScheduler(
       createdSchedules[i][0].quality.consecutiveWorkingDays +=
         resultConsecutiveDays[1];
     });
+    // Quality for the weekends
+    let qualityWeekendsObj = getQualityWeekends(
+      createdSchedules[i],
+      dateArray,
+      shiftInformation
+    );
+    createdSchedules[i][0].quality.weekendDistribution =
+      qualityWeekendsObj.weekendDistribution;
+    createdSchedules[i][0].quality.weekendNonstop =
+      qualityWeekendsObj.weekendNonstop;
 
     // Store the best value of each criteria for later filtering
     for (const key in bestRatings) {
@@ -359,6 +375,7 @@ function initializeSchedule(employeeInformation) {
     shiftDistribution: 0,
     minConsecutiveDaysOff: 0,
     consecutiveWorkingDays: 0,
+    weekendDistribution: 0,
   };
   initializedSchedule[0].target = 1;
   return initializedSchedule;

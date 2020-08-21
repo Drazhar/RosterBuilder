@@ -5,11 +5,13 @@ import './style.scss';
 import './src/routing';
 
 // Testing the scheduler
+import { getDateArr } from './src/getDateArr';
 const { runScheduler } = require('./../src/scheduler/main');
 console.log(
   runScheduler(
-    10,
+    1,
     JSON.parse(window.localStorage.getItem('definedEmployees')),
-    JSON.parse(window.localStorage.getItem('definedShifts'))
+    JSON.parse(window.localStorage.getItem('definedShifts')),
+    getDateArr(new Date(2020, 7, 1), new Date(2020, 8, 1))
   )
 );

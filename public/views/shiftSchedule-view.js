@@ -2,6 +2,7 @@ import { LitElement, html, css } from 'lit-element';
 import { scheduleConverter } from '../src/scheduleConverter';
 import * as d3 from 'd3';
 import { findIndexOfBest } from '../src/findIndexOfBest';
+import { getDateArr } from '../src/getDateArr';
 
 class shiftSchedule extends LitElement {
   static get properties() {
@@ -10,6 +11,8 @@ class shiftSchedule extends LitElement {
       shifts: { type: Array },
       indexToDisplay: { type: Number },
       isCreating: { type: Boolean },
+      startDate: { type: Date },
+      dateArray: { type: Array },
     };
   }
 
@@ -18,6 +21,9 @@ class shiftSchedule extends LitElement {
 
     this.indexToDisplay = 0;
     this.isCreating = 0;
+
+    this.startDate = new Date(2020, 8, 1);
+    this.dateArray = getDateArr(this.startDate, new Date(2020, 9, 1));
 
     if (localStorage.getItem('lastSchedule') !== null) {
       this.scheduleToDisplay = JSON.parse(localStorage.getItem('lastSchedule'));
@@ -86,10 +92,11 @@ class shiftSchedule extends LitElement {
 
   async createSchedule(lastBest) {
     const data = {
-      iterations: 10000,
+      iterations: 25000,
       employees: JSON.parse(window.localStorage.getItem('definedEmployees')),
       shifts: this.shifts,
       lastBest,
+      dateArray: this.dateArray,
     };
     const response = await fetch(`http://127.0.0.1:3000/api/createSchedule`, {
       method: 'POST',
@@ -105,12 +112,22 @@ class shiftSchedule extends LitElement {
       <div class="wrapper">
         <table>
           <col span="1" class="fixedWidth" />
+          ${this.dateArray.map((item, index) => {
+            if (item === 0 || item === 6) {
+              return html`<col span="1" style="background-color:lightgrey" />`;
+            } else if (item === 1) {
+              return html`<col span="5" />`;
+            } else if (index === 0) {
+              return html`<col span="${6 - item}" />`;
+            }
+          })}
           <thead>
             <tr>
               <th></th>
-              ${this.scheduleToDisplay[
-                this.indexToDisplay
-              ][0].assignedShifts.map((item, index) => html`<th>${index}</th>`)}
+              ${this.dateArray.map((item, index) => {
+                let day = this.startDate.getDate() + index;
+                return html`<th>${day}.</th>`;
+              })}
               <th>WH</th>
             </tr>
           </thead>
@@ -195,6 +212,24 @@ class shiftSchedule extends LitElement {
                 ${Math.round(
                   this.scheduleToDisplay[this.indexToDisplay][0].quality
                     .consecutiveWorkingDays * 1000
+                ) / 1000}
+              </td>
+            </tr>
+            <tr>
+              <td>Weekend Nonstop</td>
+              <td>
+                ${Math.round(
+                  this.scheduleToDisplay[this.indexToDisplay][0].quality
+                    .weekendNonstop * 1000
+                ) / 1000}
+              </td>
+            </tr>
+            <tr>
+              <td>Weekend Dist</td>
+              <td>
+                ${Math.round(
+                  this.scheduleToDisplay[this.indexToDisplay][0].quality
+                    .weekendDistribution * 1000
                 ) / 1000}
               </td>
             </tr>

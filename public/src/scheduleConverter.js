@@ -24,7 +24,9 @@ function shiftNumbersToNames(plan, shifts) {
       if (plan[i] == 0) {
         plan[i] = ' ';
       } else {
-        plan[i] = shifts[plan[i] - 1].id;
+        if (shifts.length >= plan[i]) {
+          plan[i] = shifts[plan[i] - 1].id;
+        }
       }
     }
   }

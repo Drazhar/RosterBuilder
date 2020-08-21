@@ -6,6 +6,7 @@ parentPort.postMessage(
     workerData.iterations,
     workerData.employees,
     workerData.shifts,
+    workerData.dateArray,
     workerData.lastBest
   )
 );

@@ -11,7 +11,7 @@ const port = 3000;
 app.use(express.static('static'));
 
 // Middleware
-app.use(express.json({ limit: '500kb' }));
+app.use(express.json({ limit: '10Mb' }));
 app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
   res.header(
