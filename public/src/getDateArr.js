@@ -5,7 +5,6 @@ export function getDateArr(startDate, endDate) {
   let dayArr = [];
   const msPerDay = 24 * 60 * 60 * 1000;
   const daysCount = (endDate - startDate) / msPerDay;
-  console.log('StartDate: ', startDate);
 
   for (let nDay = 0; nDay < daysCount; nDay++) {
     let newDay = new Date(

@@ -11,14 +11,17 @@ class shiftSchedule extends LitElement {
       shifts: { type: Array },
       indexToDisplay: { type: Number },
       isCreating: { type: Boolean },
-      startDate: { type: Date },
       dateArray: { type: Array },
+      maxQuality: {},
+      scheduleFilters: { type: Object },
+      filteredSchedules: { type: Object },
     };
   }
 
   constructor() {
     super();
 
+    this.scheduleFilters = {};
     this.indexToDisplay = 0;
     this.isCreating = 0;
 
@@ -39,6 +42,17 @@ class shiftSchedule extends LitElement {
         ],
       ];
     }
+
+    this.filteredSchedules = this.scheduleToDisplay.filter((item) => {
+      for (let key in this.scheduleFilters) {
+        if (item[0].quality[key] > this.scheduleFilters[key]) {
+          return false;
+        }
+      }
+      return true;
+    });
+
+    this.maxQuality = getMaxQuality(this.scheduleToDisplay);
 
     if (window.localStorage.getItem('definedShifts') === null) {
       this.shifts = [];
@@ -86,7 +100,8 @@ class shiftSchedule extends LitElement {
         );
       }
       isFirst = false;
-      this.indexToDisplay = findIndexOfBest(this.scheduleToDisplay);
+      this.indexToDisplay = findIndexOfBest(this.filteredSchedules);
+      this.maxQuality = getMaxQuality(this.scheduleToDisplay);
     }
   }
 
@@ -105,6 +120,19 @@ class shiftSchedule extends LitElement {
     });
     const json = await response.json();
     return json;
+  }
+
+  setFilter(event) {
+    this.scheduleFilters[event.path[0].id] = event.path[0].value;
+    this.filteredSchedules = this.scheduleToDisplay.filter((item) => {
+      for (let key in this.scheduleFilters) {
+        if (item[0].quality[key] > this.scheduleFilters[key]) {
+          return false;
+        }
+      }
+      return true;
+    });
+    this.indexToDisplay = findIndexOfBest(this.filteredSchedules);
   }
 
   render() {
@@ -132,7 +160,7 @@ class shiftSchedule extends LitElement {
             </tr>
           </thead>
           <tbody>
-            ${this.scheduleToDisplay[this.indexToDisplay].map((item) => {
+            ${this.filteredSchedules[this.indexToDisplay].map((item) => {
               return html`
                 <tr>
                   <th class="employeeNames">${item.information.name}</th>
@@ -183,7 +211,7 @@ class shiftSchedule extends LitElement {
               <td>Quality consecutive days off</td>
               <td>
                 ${Math.round(
-                  this.scheduleToDisplay[this.indexToDisplay][0].quality
+                  this.filteredSchedules[this.indexToDisplay][0].quality
                     .minConsecutiveDaysOff * 1000
                 ) / 1000}
               </td>
@@ -192,7 +220,7 @@ class shiftSchedule extends LitElement {
               <td>Squared total hour difference</td>
               <td>
                 ${Math.round(
-                  this.scheduleToDisplay[this.indexToDisplay][0].quality
+                  this.filteredSchedules[this.indexToDisplay][0].quality
                     .totalHourDifference * 1000
                 ) / 1000}
               </td>
@@ -201,7 +229,7 @@ class shiftSchedule extends LitElement {
               <td>Shift distribution</td>
               <td>
                 ${Math.round(
-                  this.scheduleToDisplay[this.indexToDisplay][0].quality
+                  this.filteredSchedules[this.indexToDisplay][0].quality
                     .shiftDistribution * 1000
                 ) / 1000}
               </td>
@@ -210,7 +238,7 @@ class shiftSchedule extends LitElement {
               <td>Consecutive working days quality</td>
               <td>
                 ${Math.round(
-                  this.scheduleToDisplay[this.indexToDisplay][0].quality
+                  this.filteredSchedules[this.indexToDisplay][0].quality
                     .consecutiveWorkingDays * 1000
                 ) / 1000}
               </td>
@@ -219,7 +247,7 @@ class shiftSchedule extends LitElement {
               <td>Weekend Nonstop</td>
               <td>
                 ${Math.round(
-                  this.scheduleToDisplay[this.indexToDisplay][0].quality
+                  this.filteredSchedules[this.indexToDisplay][0].quality
                     .weekendNonstop * 1000
                 ) / 1000}
               </td>
@@ -228,7 +256,7 @@ class shiftSchedule extends LitElement {
               <td>Weekend Dist</td>
               <td>
                 ${Math.round(
-                  this.scheduleToDisplay[this.indexToDisplay][0].quality
+                  this.filteredSchedules[this.indexToDisplay][0].quality
                     .weekendDistribution * 1000
                 ) / 1000}
               </td>
@@ -237,7 +265,7 @@ class shiftSchedule extends LitElement {
               <td>Target function:</td>
               <td>
                 ${Math.round(
-                  this.scheduleToDisplay[this.indexToDisplay][0].target
+                  this.filteredSchedules[this.indexToDisplay][0].target
                 )}
               </td>
             </tr>
@@ -250,7 +278,26 @@ class shiftSchedule extends LitElement {
           <button @click="${this.btnStopCreate}">Stop creating</button>
         </div>
         <div id="chart"></div>
-        <p>Number of good schedules: ${this.scheduleToDisplay.length - 1}</p>
+        <div class="filters">
+          ${Object.keys(this.maxQuality.max).map((key) => {
+            return html`
+              <label for="${key}"
+                >${key}: ${Math.round(this.scheduleFilters[key])}</label
+              >
+              <input
+                @change="${this.setFilter}"
+                type="range"
+                id="${key}"
+                name="${key}"
+                min="${this.maxQuality.min[key]}"
+                max="${this.maxQuality.max[key]}"
+                value="${this.scheduleFilters[key]}"
+                step="any"
+              />
+            `;
+          })}
+        </div>
+        <p>Number of good schedules: ${this.filteredSchedules.length - 1}</p>
         <p>Currently displayed: ${this.indexToDisplay}</p>
         <button @click="${this.showNext}">Show next</button>
         <button @click="${this.showPrev}">Show prev</button>
@@ -340,6 +387,11 @@ class shiftSchedule extends LitElement {
         cursor: pointer;
         fill: rgb(18, 170, 236);
       }
+
+      .filters {
+        display: flex;
+        flex-direction: column;
+      }
     `;
   }
 
@@ -351,7 +403,7 @@ class shiftSchedule extends LitElement {
     // Extract the data into clean arrays
     let data = [];
     let id = 0;
-    this.scheduleToDisplay.forEach((schedule) => {
+    this.filteredSchedules.forEach((schedule) => {
       data.push({
         id,
         x: schedule[0].quality.totalHourDifference,
@@ -366,7 +418,6 @@ class shiftSchedule extends LitElement {
 
     const chartArea = this.shadowRoot.getElementById('chart');
     chartArea.innerHTML = ''; // delete old chart
-    console.log('updating chart');
 
     // Create the chart itself
     const svg = d3
@@ -419,3 +470,24 @@ class shiftSchedule extends LitElement {
 }
 
 customElements.define('shift-schedule', shiftSchedule);
+
+function getMaxQuality(schedules) {
+  let result = { max: {}, min: {} };
+  for (let key in schedules[0][0].quality) {
+    result.max[key] = 0;
+    result.min[key] = Infinity;
+  }
+
+  for (let i = 0; i < schedules.length; i++) {
+    for (let key in schedules[i][0].quality) {
+      if (schedules[i][0].quality[key] > result.max[key]) {
+        result.max[key] = schedules[i][0].quality[key];
+      }
+      if (schedules[i][0].quality[key] < result.min[key]) {
+        result.min[key] = schedules[i][0].quality[key];
+      }
+    }
+  }
+
+  return result;
+}
