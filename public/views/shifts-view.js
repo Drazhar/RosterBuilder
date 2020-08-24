@@ -40,6 +40,7 @@ class ShiftsView extends LitElement {
         workingHours: 12,
         autoAssign: true,
         requiredEmployees: 1,
+        maxEmployees: 1,
       },
     ];
     this.openEditShift({ detail: { id: newId } });

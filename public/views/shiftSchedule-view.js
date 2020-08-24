@@ -15,6 +15,7 @@ class shiftSchedule extends LitElement {
       maxQuality: {},
       scheduleFilters: { type: Object },
       filteredSchedules: { type: Object },
+      settings: { type: Object },
     };
   }
 
@@ -24,9 +25,6 @@ class shiftSchedule extends LitElement {
     this.scheduleFilters = {};
     this.indexToDisplay = 0;
     this.isCreating = 0;
-
-    this.startDate = new Date(2020, 8, 1);
-    this.dateArray = getDateArr(this.startDate, new Date(2020, 9, 1));
 
     if (localStorage.getItem('lastSchedule') !== null) {
       this.scheduleToDisplay = JSON.parse(localStorage.getItem('lastSchedule'));
@@ -59,6 +57,18 @@ class shiftSchedule extends LitElement {
     } else {
       this.shifts = JSON.parse(window.localStorage.getItem('definedShifts'));
     }
+
+    if (window.localStorage.getItem('settings') === null) {
+      this.settings = {};
+    } else {
+      this.settings = JSON.parse(window.localStorage.getItem('settings'));
+    }
+
+    this.startDate = new Date(this.settings.startDate);
+    this.dateArray = getDateArr(
+      this.startDate,
+      new Date(this.settings.endDate)
+    );
   }
 
   showIndex(index) {
@@ -66,7 +76,7 @@ class shiftSchedule extends LitElement {
   }
 
   showNext() {
-    if (this.indexToDisplay < this.scheduleToDisplay.length - 1) {
+    if (this.indexToDisplay < this.filteredSchedules.length - 1) {
       this.indexToDisplay++;
     }
   }
@@ -107,7 +117,7 @@ class shiftSchedule extends LitElement {
 
   async createSchedule(lastBest) {
     const data = {
-      iterations: 25000,
+      iterations: 50000,
       employees: JSON.parse(window.localStorage.getItem('definedEmployees')),
       shifts: this.shifts,
       lastBest,
@@ -276,6 +286,8 @@ class shiftSchedule extends LitElement {
             Start creating roster
           </button>
           <button @click="${this.btnStopCreate}">Stop creating</button>
+          <button @click="${this.showNext}">Show next</button>
+          <button @click="${this.showPrev}">Show prev</button>
         </div>
         <div id="chart"></div>
         <div class="filters">
@@ -299,8 +311,6 @@ class shiftSchedule extends LitElement {
         </div>
         <p>Number of good schedules: ${this.filteredSchedules.length - 1}</p>
         <p>Currently displayed: ${this.indexToDisplay}</p>
-        <button @click="${this.showNext}">Show next</button>
-        <button @click="${this.showPrev}">Show prev</button>
       </div>
     `;
   }

@@ -33,6 +33,9 @@ class EditShift extends LitElement {
     this.shift.requiredEmployees = this.shadowRoot.getElementById(
       'requiredEmployees'
     ).value;
+    this.shift.maxEmployees = this.shadowRoot.getElementById(
+      'maxEmployees'
+    ).value;
 
     // Dispatch event with this employee object to save it to the database or local storage
     this.dispatchEvent(
@@ -82,6 +85,15 @@ class EditShift extends LitElement {
                   type="number"
                   id="requiredEmployees"
                   value="${this.shift.requiredEmployees}"
+                  isRequired
+                />
+              </label>
+              <label
+                >Max employees:
+                <input
+                  type="number"
+                  id="maxEmployees"
+                  value="${this.shift.maxEmployees}"
                   isRequired
                 />
               </label>

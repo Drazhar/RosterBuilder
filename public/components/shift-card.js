@@ -52,7 +52,12 @@ class ShiftCard extends LitElement {
 
             <tr>
               <td>Employees</td>
-              <td>${this.shift.requiredEmployees}</td>
+              <td>
+                ${this.shift.requiredEmployees === this.shift.maxEmployees
+                  ? this.shift.requiredEmployees
+                  : html`${this.shift.requiredEmployees} -
+                    ${this.shift.maxEmployees}`}
+              </td>
             </tr>
           </tbody>
         </table>
