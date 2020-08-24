@@ -55,7 +55,7 @@ function runScheduler(
 
     for (let currentDay = 0; currentDay < numberOfDays; currentDay++) {
       // Collect information and define probabilities for the individual shifts
-      obtainInformation(createdSchedules[i], shiftInformation);
+      obtainInformation(createdSchedules[i], shiftInformation, currentDay);
       assignEmployees(
         createdSchedules[i],
         currentDay,
@@ -120,7 +120,7 @@ function runScheduler(
   return findBestSchedules(createdSchedules);
 }
 
-function obtainInformation(inputSchedule, shiftInformation) {
+function obtainInformation(inputSchedule, shiftInformation, currentDay) {
   inputSchedule.forEach((employee) => {
     // Check which shift assignments are possible
     if (employee.schedulingInformation.recentAssignment.shift === 0) {
@@ -211,12 +211,8 @@ function obtainInformation(inputSchedule, shiftInformation) {
       }
     }
 
-    // Lower the probability if working days are high
     reduceProbabilityForHighWorkload(employee);
-    // removeAutoAssignSetInterchangeable(
-    //   employee.schedulingInformation,
-    //   shiftInformation
-    // );
+    adjustProbabilityEmployeeWishes(employee, currentDay);
   });
 }
 
@@ -249,14 +245,6 @@ function assignEmployees(inputSchedule, day, shiftInformation, dateArray) {
           inputSchedule[i].information.plannedWorkingTime -
           inputSchedule[i].schedulingInformation.hoursWorked;
       }
-
-      // console.log('Days left: ', daysLeft);
-      // console.log('min workingHours left min: ', workHoursLeftMin);
-      // console.log('min workingHours left max: ', workHoursLeftMax);
-      // console.log('employeeHoursLeft: ', employeeHoursLeft);
-      // console.log(
-      //   `Day ${day} employees ${employeeAmount} is weekday ${weekday}`
-      // );
 
       if (employeeHoursLeft >= workHoursLeftMax) {
         employeeAmount = shiftInformation[currentShift].maxEmployees;
@@ -319,7 +307,6 @@ function updateSchedulingInformation(
   currentShift,
   shiftInformation
 ) {
-  // need to add the interchangeable!!!
   if (schedulingInformation.recentAssignment.shift === currentShift) {
     schedulingInformation.recentAssignment.numberOfDays++;
   } else {
@@ -363,6 +350,10 @@ function reduceProbabilityForHighWorkload(employee) {
       (x) => (x * (1 - reducePlannedReached)) / 10
     );
   }
+}
+
+function adjustProbabilityEmployeeWishes(employee, currentDay) {
+  // console.log(employee, currentDay);
 }
 
 // function removeAutoAssignSetInterchangeable(

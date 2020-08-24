@@ -4,6 +4,7 @@ import '../components/edit-employee.js';
 import { nanoid } from 'nanoid';
 import { randomAvataaarURL } from '../src/randomAvataaarURL';
 import { setDefaultShiftDist } from '../src/defaultShiftDist';
+import { getDateArr } from '../src/getDateArr';
 
 class EmployeesView extends LitElement {
   static get properties() {
@@ -13,6 +14,8 @@ class EmployeesView extends LitElement {
       editEmployeeObject: { type: Object },
       editPosLeft: { type: Number },
       shifts: { type: Array },
+      settings: { type: Object },
+      dateArray: { type: Array },
     };
   }
 
@@ -33,6 +36,18 @@ class EmployeesView extends LitElement {
     } else {
       this.shifts = JSON.parse(window.localStorage.getItem('definedShifts'));
     }
+
+    if (window.localStorage.getItem('settings') === null) {
+      this.settings = {};
+    } else {
+      this.settings = JSON.parse(window.localStorage.getItem('settings'));
+    }
+
+    this.startDate = new Date(this.settings.startDate);
+    this.dateArray = getDateArr(
+      this.startDate,
+      new Date(this.settings.endDate)
+    );
   }
 
   updated() {
@@ -60,6 +75,7 @@ class EmployeesView extends LitElement {
         minConsecutiveDaysOff: 2,
         shift: setDefaultShiftDist(this.shifts),
         avatar: randomAvataaarURL(newId),
+        shiftWishes: new Array(this.dateArray.length).fill(0),
       },
     ];
     this.openEditEmployee({ detail: { id: newId } });
@@ -109,8 +125,10 @@ class EmployeesView extends LitElement {
       ${this.editEmployee
         ? html`<edit-employee
             posLeft="${this.editPosLeft}"
+            .settings="${this.settings}"
             .employee="${this.editEmployeeObject}"
             .shifts="${this.shifts}"
+            .dateArray="${this.dateArray}"
             @close-me="${this.closeEditEmployee}"
             @update-me="${this.updateEmployee}"
           ></edit-employee>`

@@ -283,7 +283,7 @@ class shiftSchedule extends LitElement {
         </table>
         <div>
           <button @click="${this.btnCreateSchedule}">
-            Start creating roster
+            Start creating roster: ${this.isCreating}
           </button>
           <button @click="${this.btnStopCreate}">Stop creating</button>
           <button @click="${this.showNext}">Show next</button>

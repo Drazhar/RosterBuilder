@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit-element';
 import { nanoid } from 'nanoid';
 import { randomAvataaarURL } from '../src/randomAvataaarURL';
+import './edit-wishes';
 
 class EditEmployee extends LitElement {
   static get properties() {
@@ -8,11 +9,15 @@ class EditEmployee extends LitElement {
       employee: { type: Object },
       shifts: { type: Array },
       posLeft: { type: Number },
+      dateArray: { type: Array },
+      settings: { type: Object },
+      isEditWishes: { type: Boolean },
     };
   }
 
   constructor() {
     super();
+    this.isEditWishes = false;
   }
 
   sendCloseEvent() {
@@ -63,8 +68,28 @@ class EditEmployee extends LitElement {
     this.requestUpdate();
   }
 
+  editShiftWishes(event) {
+    event.preventDefault();
+    this.isEditWishes = true;
+    console.log(this.isEditWishes);
+  }
+
+  updateWishes(event) {
+    this.isEditWishes = false;
+    console.log(event);
+  }
+
   render() {
     return html`
+      ${this.isEditWishes
+        ? html`<edit-wishes
+            .settings="${this.settings}"
+            .dateArray="${this.dateArray}"
+            .shifts="${this.shifts}"
+            .employee="${this.employee}"
+            @save-wishes="${this.updateWishes}"
+          ></edit-wishes>`
+        : console.log(this.isEditWishes)}
       <div class="greyout">
         <div class="edit" style="left: ${this.posLeft}px">
           <img src="${this.employee.avatar}" @click="${this.randomImage}" />
@@ -161,6 +186,14 @@ class EditEmployee extends LitElement {
                     </label>`
                   )
                 : html`<p>There are no shifts defined...</p>`}
+            </fieldset>
+            <fieldset>
+              <legend>
+                Wished and vacation:
+              </legend>
+              <button @click="${this.editShiftWishes}">
+                Define shift wishes
+              </button>
             </fieldset>
             <button
               type="submit"
