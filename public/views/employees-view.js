@@ -125,10 +125,8 @@ class EmployeesView extends LitElement {
       ${this.editEmployee
         ? html`<edit-employee
             posLeft="${this.editPosLeft}"
-            .settings="${this.settings}"
             .employee="${this.editEmployeeObject}"
             .shifts="${this.shifts}"
-            .dateArray="${this.dateArray}"
             @close-me="${this.closeEditEmployee}"
             @update-me="${this.updateEmployee}"
           ></edit-employee>`

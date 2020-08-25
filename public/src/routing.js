@@ -40,6 +40,14 @@ function initRouter() {
       },
     },
     {
+      path: '/wishes',
+      component: 'wishes-view',
+      action: () => {
+        import('../views/wishes-view');
+        activeMenuItem('wishes');
+      },
+    },
+    {
       path: '(.*)',
       component: 'not-found-view',
       action: () => {
