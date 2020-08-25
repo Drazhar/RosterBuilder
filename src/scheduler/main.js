@@ -7,6 +7,7 @@ const {
 } = require('./functions/qualityConsecutiveDays');
 const { findBestSchedules } = require('./functions/findBestSchedules');
 const { getQualityWeekends } = require('./functions/qualityWeekends');
+const { getQualityWishes } = require('./functions/qualityWishes');
 
 function runScheduler(
   iterations = 1,
@@ -39,6 +40,7 @@ function runScheduler(
     consecutiveWorkingDays: Infinity,
     weekendDistribution: Infinity,
     weekendNonstop: Infinity,
+    wishFulfillment: Infinity,
   };
   let targetWeights = {
     totalHourDifference: 1,
@@ -47,6 +49,7 @@ function runScheduler(
     consecutiveWorkingDays: 0.2,
     weekendDistribution: 0.5,
     weekendNonstop: 1,
+    wishFulfillment: 0.1,
   };
   const numberOfDays = dateArray.length; // This should be set outside of the function later.
 
@@ -95,6 +98,10 @@ function runScheduler(
       qualityWeekendsObj.weekendDistribution;
     createdSchedules[i][0].quality.weekendNonstop =
       qualityWeekendsObj.weekendNonstop;
+
+    createdSchedules[i][0].quality.wishFulfillment = getQualityWishes(
+      createdSchedules[i]
+    );
 
     // Store the best value of each criteria for later filtering
     for (const key in bestRatings) {
@@ -353,36 +360,26 @@ function reduceProbabilityForHighWorkload(employee) {
 }
 
 function adjustProbabilityEmployeeWishes(employee, currentDay) {
-  // console.log(employee, currentDay);
+  if (employee.information.shiftWishes[currentDay] === ' ') {
+    // Employee wants a day off
+    for (
+      let i = 0;
+      i < employee.schedulingInformation.possibleShifts.length;
+      i++
+    ) {
+      employee.schedulingInformation.possibleShifts[i] *= 0.2;
+    }
+  } else if (employee.information.shiftWishes[currentDay] != 0) {
+    for (let i = 1; i < employee.schedulingInformation.shift.map.length; i++) {
+      if (
+        employee.schedulingInformation.shift.map[i] ==
+        employee.information.shiftWishes[currentDay]
+      ) {
+        employee.schedulingInformation.possibleShifts[i] *= 5;
+      }
+    }
+  }
 }
-
-// function removeAutoAssignSetInterchangeable(
-//   schedulingInformation,
-//   shiftInformation
-// ) {
-//   console.log("schedulingInf", schedulingInformation);
-//   console.log("shift information", shiftInformation);
-//   for (let i = 1; i < shiftInformation.length; i++) {
-//     if (shiftInformation[i].hasOwnProperty("interchangeableWith")) {
-//       shiftInformation[i].interchangeableWith.forEach((interchangeable) => {
-//         if (
-//           schedulingInformation.possibleShifts[i] >
-//           schedulingInformation.possibleShifts[interchangeable]
-//         ) {
-//           schedulingInformation.possibleShifts[interchangeable] =
-//             schedulingInformation.possibleShifts[i];
-//         } else {
-//           schedulingInformation.possibleShifts[i] =
-//             schedulingInformation.possibleShifts[interchangeable];
-//         }
-//       });
-//     }
-
-//     if (!shiftInformation[i].autoAssign) {
-//       schedulingInformation.possibleShifts[i] = 0;
-//     }
-//   }
-// }
 
 function initializeSchedule(employeeInformation) {
   // Initialized a schedule with the employee information.
@@ -401,6 +398,7 @@ function initializeSchedule(employeeInformation) {
           preferred: employee.consecutiveWorkingDays.preferred,
         },
         minConsecutiveDaysOff: employee.minConsecutiveDaysOff,
+        shiftWishes: employee.shiftWishes,
       },
       schedulingInformation: {
         hoursWorked: 0,

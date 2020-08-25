@@ -112,6 +112,7 @@ class shiftSchedule extends LitElement {
       isFirst = false;
       this.indexToDisplay = findIndexOfBest(this.filteredSchedules);
       this.maxQuality = getMaxQuality(this.scheduleToDisplay);
+      this.requestUpdate();
     }
   }
 
@@ -217,68 +218,20 @@ class shiftSchedule extends LitElement {
 
         <table>
           <tbody>
-            <tr>
-              <td>Quality consecutive days off</td>
-              <td>
-                ${Math.round(
-                  this.filteredSchedules[this.indexToDisplay][0].quality
-                    .minConsecutiveDaysOff * 1000
-                ) / 1000}
-              </td>
-            </tr>
-            <tr>
-              <td>Squared total hour difference</td>
-              <td>
-                ${Math.round(
-                  this.filteredSchedules[this.indexToDisplay][0].quality
-                    .totalHourDifference * 1000
-                ) / 1000}
-              </td>
-            </tr>
-            <tr>
-              <td>Shift distribution</td>
-              <td>
-                ${Math.round(
-                  this.filteredSchedules[this.indexToDisplay][0].quality
-                    .shiftDistribution * 1000
-                ) / 1000}
-              </td>
-            </tr>
-            <tr>
-              <td>Consecutive working days quality</td>
-              <td>
-                ${Math.round(
-                  this.filteredSchedules[this.indexToDisplay][0].quality
-                    .consecutiveWorkingDays * 1000
-                ) / 1000}
-              </td>
-            </tr>
-            <tr>
-              <td>Weekend Nonstop</td>
-              <td>
-                ${Math.round(
-                  this.filteredSchedules[this.indexToDisplay][0].quality
-                    .weekendNonstop * 1000
-                ) / 1000}
-              </td>
-            </tr>
-            <tr>
-              <td>Weekend Dist</td>
-              <td>
-                ${Math.round(
-                  this.filteredSchedules[this.indexToDisplay][0].quality
-                    .weekendDistribution * 1000
-                ) / 1000}
-              </td>
-            </tr>
-            <tr>
-              <td>Target function:</td>
-              <td>
-                ${Math.round(
-                  this.filteredSchedules[this.indexToDisplay][0].target
-                )}
-              </td>
-            </tr>
+            ${Object.keys(this.maxQuality.max).map((key) => {
+              return html`
+                <tr>
+                  <td>${key}</td>
+                  <td>
+                    ${Math.round(
+                      this.filteredSchedules[this.indexToDisplay][0].quality[
+                        key
+                      ] * 1000
+                    ) / 1000}
+                  </td>
+                </tr>
+              `;
+            })}
           </tbody>
         </table>
         <div>
