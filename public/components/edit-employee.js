@@ -51,8 +51,6 @@ class EditEmployee extends LitElement {
     const recentShiftString = this.shadowRoot.getElementById('recentShift')
       .value;
     for (let i = 0; i < this.shifts.length; i++) {
-      console.log('recentshift', recentShiftString);
-      console.log('this', this.shifts[i].id);
       if (this.shifts[i].id === recentShiftString) {
         this.employee.recentAssignment.shift = i + 1;
         break;
