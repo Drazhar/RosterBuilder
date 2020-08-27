@@ -18,7 +18,10 @@ function getParetoFront(P) {
 function checkDomination(B, T) {
   let M = [];
   for (const B_ITEM of B) {
-    if (B_ITEM[0].quality.minConsecutiveDaysOff !== 0) {
+    if (
+      B_ITEM[0].quality.minConsecutiveDaysOff !== 0 ||
+      B_ITEM[0].quality.vacationFulfillment !== 0
+    ) {
       continue;
     }
     let isDominated = false;
@@ -26,12 +29,10 @@ function checkDomination(B, T) {
       let allWorse = [];
 
       for (const key in T_ITEM[0].quality) {
-        if (key !== 'minConsecutiveDaysOff') {
-          if (B_ITEM[0].quality[key] >= T_ITEM[0].quality[key]) {
-            allWorse.push(true);
-          } else {
-            allWorse.push(false);
-          }
+        if (B_ITEM[0].quality[key] >= T_ITEM[0].quality[key]) {
+          allWorse.push(true);
+        } else {
+          allWorse.push(false);
         }
       }
       if (allWorse.every((item) => item)) {

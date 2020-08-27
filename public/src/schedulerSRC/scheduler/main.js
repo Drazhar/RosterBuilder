@@ -61,7 +61,12 @@ function runScheduler(
 
     for (let currentDay = 0; currentDay < numberOfDays; currentDay++) {
       // Collect information and define probabilities for the individual shifts
-      obtainInformation(createdSchedules[i], shiftInformation, currentDay);
+      obtainInformation(
+        createdSchedules[i],
+        shiftInformation,
+        currentDay,
+        dateArray
+      );
       assignEmployees(
         createdSchedules[i],
         currentDay,
@@ -134,7 +139,12 @@ function runScheduler(
   return findBestSchedules(createdSchedules);
 }
 
-function obtainInformation(inputSchedule, shiftInformation, currentDay) {
+function obtainInformation(
+  inputSchedule,
+  shiftInformation,
+  currentDay,
+  dateArray
+) {
   inputSchedule.forEach((employee) => {
     // Check which shift assignments are possible
     if (employee.schedulingInformation.recentAssignment.shift === 0) {
@@ -157,7 +167,7 @@ function obtainInformation(inputSchedule, shiftInformation, currentDay) {
       // Employee had no day off, still working. Set base probability
       employee.schedulingInformation.possibleShifts = new Array(
         shiftInformation.length
-      ).fill(0.0001);
+      ).fill(0.00001);
 
       if (
         employee.schedulingInformation.recentAssignment.numberOfDays <
@@ -166,7 +176,7 @@ function obtainInformation(inputSchedule, shiftInformation, currentDay) {
         // Employee worked less days than min
         employee.schedulingInformation.possibleShifts[
           employee.schedulingInformation.recentAssignment.shift
-        ] = 1000;
+        ] = 100000;
       } else if (
         employee.schedulingInformation.recentAssignment.numberOfDays <
         employee.information.consecutiveWorkingDays.preferred
@@ -190,45 +200,107 @@ function obtainInformation(inputSchedule, shiftInformation, currentDay) {
           (employee.information.consecutiveWorkingDays.max -
             employee.schedulingInformation.recentAssignment.numberOfDays) /
           employee.information.consecutiveWorkingDays.max;
+      } else if (
+        employee.schedulingInformation.recentAssignment.numberOfDays >
+        employee.information.consecutiveWorkingDays.max
+      ) {
+        employee.schedulingInformation.possibleShifts[
+          employee.schedulingInformation.recentAssignment.shift
+        ] = 0.0000001;
       }
     }
 
     // Adjust probabilities regarding the shift distribution
-    for (let i = 1; i < shiftInformation.length; i++) {
-      if (employee.schedulingInformation.shift.plannedDistribution[i] === 0) {
-        employee.schedulingInformation.possibleShifts[i] = 0;
-      }
-      if (employee.schedulingInformation.shift.plannedDistribution[i] > 0) {
-        let plannedDist =
-          employee.schedulingInformation.shift.plannedDistribution[i] /
-          sumAutoAssignDistribution(
-            employee.schedulingInformation.shift.plannedDistribution,
-            employee.schedulingInformation.shift.plannedDistribution
-          );
-        let currentDist =
-          employee.schedulingInformation.shift.worked[i] /
-          sumAutoAssignDistribution(
-            employee.schedulingInformation.shift.worked,
-            employee.schedulingInformation.shift.plannedDistribution
-          );
-        let relation = plannedDist / currentDist;
+    // for (let i = 1; i < shiftInformation.length; i++) {
+    //   if (employee.schedulingInformation.shift.plannedDistribution[i] === 0) {
+    //     employee.schedulingInformation.possibleShifts[i] = 0;
+    //   }
+    //   if (employee.schedulingInformation.shift.plannedDistribution[i] > 0) {
+    //     let plannedDist =
+    //       employee.schedulingInformation.shift.plannedDistribution[i] /
+    //       sumAutoAssignDistribution(
+    //         employee.schedulingInformation.shift.plannedDistribution,
+    //         employee.schedulingInformation.shift.plannedDistribution
+    //       );
+    //     let currentDist =
+    //       employee.schedulingInformation.shift.worked[i] /
+    //       sumAutoAssignDistribution(
+    //         employee.schedulingInformation.shift.worked,
+    //         employee.schedulingInformation.shift.plannedDistribution
+    //       );
+    //     let relation = plannedDist / currentDist;
 
-        // Some relations are NaN or infinity
-        if (relation > 5) {
-          relation = 4;
-        } else if (relation < 0.1) {
-          relation = 0.25;
-        } else {
-          relation = 1;
-        }
-        employee.schedulingInformation.possibleShifts[i] *= relation ** 2;
-      }
-    }
+    //     // Some relations are NaN or infinity
+    //     if (relation > 5) {
+    //       relation = 4;
+    //     } else if (relation < 0.1) {
+    //       relation = 0.25;
+    //     } else {
+    //       relation = 1;
+    //     }
+    //     employee.schedulingInformation.possibleShifts[i] *= relation ** 2;
+    //   }
+    // }
 
+    adjustProbabilityWeekends(employee, dateArray, currentDay);
     reduceProbabilityForHighWorkload(employee);
     adjustProbabilityEmployeeWishes(employee, currentDay);
     adjustProbabilityEmployeeVacation(employee, currentDay);
+    adjustProbabilityMinDaysOff(employee);
   });
+}
+
+function adjustProbabilityMinDaysOff(employee) {
+  if (employee.schedulingInformation.recentAssignment.shift == 0) {
+    if (
+      employee.schedulingInformation.recentAssignment.numberOfDays <
+      employee.information.minConsecutiveDaysOff
+    ) {
+      employee.schedulingInformation.possibleShifts = employee.schedulingInformation.possibleShifts.map(
+        (x) => x / 10000
+      );
+    }
+  } else {
+    employee.schedulingInformation.possibleShifts = employee.schedulingInformation.possibleShifts.map(
+      (x, i) =>
+        i != employee.schedulingInformation.recentAssignment.shift
+          ? x / 10000
+          : x
+    );
+  }
+}
+
+function adjustProbabilityWeekends(employee, dateArray, currentDay) {
+  if (dateArray[currentDay] == 6) {
+    // Saturday
+    if (employee.schedulingInformation.recentAssignment.shift != 0) {
+      if (
+        employee.schedulingInformation.recentAssignment.numberOfDays >
+        employee.information.consecutiveWorkingDays.max - 2
+      ) {
+        employee.schedulingInformation.possibleShifts = employee.schedulingInformation.possibleShifts.map(
+          (x) => x / 10000
+        );
+      }
+    }
+  } else if (dateArray[currentDay] == 0) {
+    // Sunday
+    if (employee.schedulingInformation.recentAssignment.shift != 0) {
+      employee.schedulingInformation.possibleShifts = employee.schedulingInformation.possibleShifts.map(
+        (x) => x * 10000
+      );
+    }
+  } else if (
+    dateArray[currentDay] >=
+    6 - employee.information.consecutiveWorkingDays.min
+  ) {
+    // if (employee.schedulingInformation.recentAssignment.shift == 0) {
+    //   console.log('reduce it');
+    //   employee.schedulingInformation.possibleShifts = employee.schedulingInformation.possibleShifts.map(
+    //     (x) => x * 100000
+    //   );
+    // }
+  }
 }
 
 function assignEmployees(inputSchedule, day, shiftInformation, dateArray) {
@@ -347,7 +419,7 @@ function sumAutoAssignDistribution(shiftDistribution, plannedDistribution) {
 }
 
 function reduceProbabilityForHighWorkload(employee) {
-  const reducePlannedReached = 0.9; // The factor by which the probability is reduced if the planned working days are reached
+  const reducePlannedReached = 0.2; // The factor by which the probability is reduced if the planned working days are reached
   // If workingDays are larger than plannedWorkingDays, the formula could produce negative probabilities
   if (
     employee.schedulingInformation.hoursWorked <
@@ -361,8 +433,12 @@ function reduceProbabilityForHighWorkload(employee) {
             employee.information.plannedWorkingTime)
     );
   } else {
+    let division = 3;
+    if (employee.information.overtime > 0) {
+      division = 2;
+    }
     employee.schedulingInformation.possibleShifts = employee.schedulingInformation.possibleShifts.map(
-      (x) => (x * (1 - reducePlannedReached)) / 10
+      (x) => (x * (1 - reducePlannedReached)) / division
     );
   }
 }
@@ -375,7 +451,7 @@ function adjustProbabilityEmployeeWishes(employee, currentDay) {
       i < employee.schedulingInformation.possibleShifts.length;
       i++
     ) {
-      employee.schedulingInformation.possibleShifts[i] *= 0.1;
+      employee.schedulingInformation.possibleShifts[i] *= 0.5;
     }
   } else if (employee.information.shiftWishes[currentDay] != 0) {
     for (let i = 1; i < employee.schedulingInformation.shift.map.length; i++) {
@@ -383,7 +459,7 @@ function adjustProbabilityEmployeeWishes(employee, currentDay) {
         employee.schedulingInformation.shift.map[i] ==
         employee.information.shiftWishes[currentDay]
       ) {
-        employee.schedulingInformation.possibleShifts[i] *= 10;
+        employee.schedulingInformation.possibleShifts[i] *= 2;
       }
     }
   }
@@ -397,7 +473,7 @@ function adjustProbabilityEmployeeVacation(employee, currentDay) {
       i < employee.schedulingInformation.possibleShifts.length;
       i++
     ) {
-      employee.schedulingInformation.possibleShifts[i] *= 0.0001;
+      employee.schedulingInformation.possibleShifts[i] *= 0.00000001;
     }
   } else if (employee.information.shiftVacation[currentDay] != 0) {
     for (let i = 1; i < employee.schedulingInformation.shift.map.length; i++) {
@@ -405,7 +481,7 @@ function adjustProbabilityEmployeeVacation(employee, currentDay) {
         employee.schedulingInformation.shift.map[i] ==
         employee.information.shiftVacation[currentDay]
       ) {
-        employee.schedulingInformation.possibleShifts[i] *= 10000;
+        employee.schedulingInformation.possibleShifts[i] *= 100000000;
       }
     }
   }

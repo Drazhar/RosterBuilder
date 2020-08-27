@@ -148,8 +148,8 @@ class WishesView extends LitElement {
                             @change=${this.wishChanged}
                           >
                             ${parseInt(wish) === 0
-                              ? html`<option value="0" selected>none</option>`
-                              : html`<option value="0">none</option>`}
+                              ? html`<option value="0" selected></option>`
+                              : html`<option value="0"></option>`}
                             ${wish === ' '
                               ? html`<option value=" " selected>free</option>`
                               : html`<option value=" ">free</option>`}
@@ -228,8 +228,8 @@ class WishesView extends LitElement {
                             @change=${this.vacationChanged}
                           >
                             ${parseInt(wish) === 0
-                              ? html`<option value="0" selected>none</option>`
-                              : html`<option value="0">none</option>`}
+                              ? html`<option value="0" selected></option>`
+                              : html`<option value="0"></option>`}
                             ${wish === ' '
                               ? html`<option value=" " selected>free</option>`
                               : html`<option value=" ">free</option>`}

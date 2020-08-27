@@ -12,7 +12,9 @@ test('Overtime 0', () => {
       },
     })
   ).toBe(0);
+});
 
+test('02 Overtime 0', () => {
   expect(
     qualityWorkingHours({
       information: {
@@ -26,7 +28,7 @@ test('Overtime 0', () => {
   ).toBe(8464);
 });
 
-test('Overtime positive', () => {
+test('Overtime positive 01', () => {
   expect(
     qualityWorkingHours({
       information: {
@@ -37,8 +39,10 @@ test('Overtime positive', () => {
         hoursWorked: 182,
       },
     })
-  ).toBeCloseTo(0.5208);
+  ).toBeCloseTo(0);
+});
 
+test('Overtime positive 02', () => {
   expect(
     qualityWorkingHours({
       information: {
@@ -50,7 +54,9 @@ test('Overtime positive', () => {
       },
     })
   ).toBeCloseTo(100);
+});
 
+test('Overtime positive 03', () => {
   expect(
     qualityWorkingHours({
       information: {
@@ -61,10 +67,10 @@ test('Overtime positive', () => {
         hoursWorked: 172,
       },
     })
-  ).toBeCloseTo(400);
+  ).toBeCloseTo(100);
 });
 
-test('Overtime negative', () => {
+test('Overtime negative 01', () => {
   expect(
     qualityWorkingHours({
       information: {
@@ -75,8 +81,10 @@ test('Overtime negative', () => {
         hoursWorked: 202,
       },
     })
-  ).toBeCloseTo(0.5208);
+  ).toBeCloseTo(0);
+});
 
+test('Overtime negative 02', () => {
   expect(
     qualityWorkingHours({
       information: {

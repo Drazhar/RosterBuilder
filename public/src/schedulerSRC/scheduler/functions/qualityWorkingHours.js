@@ -14,44 +14,33 @@ function qualityWorkingHours(employee) {
   // Value is between 0 and 1 if its the maximum shift length away from
   // planned in the direction of the overtime. If overtime is 0, it's
   // allowed to deviate in both directions.
-  let result = 0;
   let difference =
     employee.schedulingInformation.hoursWorked -
     employee.information.plannedWorkingTime;
-  let smallDeviation = false;
-  const Factor = 0.1;
-  const AllowedDeviation = Factor * employee.information.plannedWorkingTime;
 
-  if (employee.information.overtime === 0) {
-    // Employee has no overtime
-    // if (Math.abs(difference) <= AllowedDeviation) {
-    //   smallDeviation = true;
-    //   // Slightly worsen the result to consider employees with overtime over overtime 0
-    //   difference = difference * 2;
-    // }
-  } else if (employee.information.overtime > 0) {
-    // Employee has overtime, so it's acceptable to work less this period
-    if (difference < 0 && -difference <= AllowedDeviation) {
-      smallDeviation = true;
+  // console.log({ difference });
+  // console.log('overtime', employee.information.overtime);
+
+  if (difference < 0 && employee.information.overtime > 0) {
+    if (employee.information.overtime > Math.abs(difference)) {
+      difference = 0;
+    } else if (employee.information.overtime > 12) {
+      difference += 12;
+    } else {
+      difference += employee.information.overtime;
     }
-  } else {
-    // Employee has negative overtime, so it's acceptable to work more this period
-    if (difference > 0 && difference <= AllowedDeviation) {
-      smallDeviation = true;
+  } else if (difference > 0 && employee.information.overtime < 0) {
+    if (Math.abs(employee.information.overtime) > difference) {
+      difference = 0;
+    } else if (employee.information.overtime < -12) {
+      difference -= 12;
+    } else {
+      difference += employee.information.overtime;
     }
   }
+  // console.log('difference after: ', difference);
 
-  if (smallDeviation) {
-    result = Math.abs(difference / AllowedDeviation);
-  } else {
-    result =
-      Math.abs(
-        employee.information.plannedWorkingTime -
-          employee.schedulingInformation.hoursWorked
-      ) ** 2;
-  }
-
-  return result;
+  return Math.abs(difference) ** 2;
 }
 
 module.exports = { qualityWorkingHours };

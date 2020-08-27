@@ -125,6 +125,18 @@ class shiftSchedule extends LitElement {
 
       this.indexToDisplay = findIndexOfBest(this.filteredSchedules);
       this.maxQuality = getMaxQuality(this.scheduleToDisplay);
+
+      if (this.scheduleToDisplay.length > 0) {
+        this.filteredSchedules = this.scheduleToDisplay.filter((item) => {
+          for (let key in this.scheduleFilters) {
+            if (item[0].quality[key] > this.scheduleFilters[key]) {
+              return false;
+            }
+          }
+          return true;
+        });
+      }
+
       this.requestUpdate();
 
       if (this.isCreating) {
@@ -169,6 +181,7 @@ class shiftSchedule extends LitElement {
               return html`<col span="${6 - item}" />`;
             }
           })}
+          <col span="1" class="fixedWidth" />
           <thead>
             <tr>
               <th></th>
@@ -176,50 +189,59 @@ class shiftSchedule extends LitElement {
                 let day = this.startDate.getDate() + index;
                 return html`<th>${day}.</th>`;
               })}
-              <th>WH</th>
+              <th>diff / new OT</th>
             </tr>
           </thead>
           <tbody>
-            ${this.filteredSchedules[this.indexToDisplay].map((item) => {
-              return html`
-                <tr>
-                  <th class="employeeNames">${item.information.name}</th>
-                  ${scheduleConverter(item.assignedShifts, this.shifts).map(
-                    (assigned) => {
-                      return html`
-                        <td
-                          colspan=${assigned.count}
-                          style="${this.shifts.filter(
-                            (item) => item.id === assigned.value
-                          ).length > 0
-                            ? `background-color:#${
-                                this.shifts.filter(
-                                  (item) => item.id === assigned.value
-                                )[0].colors.backgroundColor
-                              }; color:#${
-                                this.shifts.filter(
-                                  (item) => item.id === assigned.value
-                                )[0].colors.textColor
-                              }`
-                            : ''}"
-                        >
-                          ${this.shifts.filter(
-                            (item) => item.id === assigned.value
-                          ).length > 0
-                            ? this.shifts.filter(
+            ${this.filteredSchedules.length === 0
+              ? ''
+              : this.filteredSchedules[this.indexToDisplay].map((item) => {
+                  return html`
+                    <tr>
+                      <th class="employeeNames">${item.information.name}</th>
+                      ${scheduleConverter(item.assignedShifts, this.shifts).map(
+                        (assigned) => {
+                          return html`
+                            <td
+                              colspan=${assigned.count}
+                              style="${this.shifts.filter(
                                 (item) => item.id === assigned.value
-                              )[0].name +
-                              ' ' +
-                              assigned.count
-                            : ''}
-                        </td>
-                      `;
-                    }
-                  )}
-                  <td>${item.schedulingInformation.hoursWorked}</td>
-                </tr>
-              `;
-            })}
+                              ).length > 0
+                                ? `background-color:#${
+                                    this.shifts.filter(
+                                      (item) => item.id === assigned.value
+                                    )[0].colors.backgroundColor
+                                  }; color:#${
+                                    this.shifts.filter(
+                                      (item) => item.id === assigned.value
+                                    )[0].colors.textColor
+                                  }`
+                                : ''}"
+                            >
+                              ${this.shifts.filter(
+                                (item) => item.id === assigned.value
+                              ).length > 0
+                                ? this.shifts.filter(
+                                    (item) => item.id === assigned.value
+                                  )[0].name +
+                                  ' ' +
+                                  assigned.count
+                                : ''}
+                            </td>
+                          `;
+                        }
+                      )}
+                      <td>
+                        ${item.schedulingInformation.hoursWorked -
+                        item.information.plannedWorkingTime}
+                        /
+                        ${item.information.overtime +
+                        item.schedulingInformation.hoursWorked -
+                        item.information.plannedWorkingTime}
+                      </td>
+                    </tr>
+                  `;
+                })}
           </tbody>
         </table>
 
@@ -232,10 +254,12 @@ class shiftSchedule extends LitElement {
                   <td>
                     <table class="qualityCells">
                       <td>
-                        ${Math.round(
-                          this.filteredSchedules[this.indexToDisplay][0]
-                            .quality[key] * 1000
-                        ) / 1000}
+                        ${this.filteredSchedules.length === 0
+                          ? 0
+                          : Math.round(
+                              this.filteredSchedules[this.indexToDisplay][0]
+                                .quality[key] * 1000
+                            ) / 1000}
                       </td>
                       <td>
                         <input
@@ -267,7 +291,7 @@ class shiftSchedule extends LitElement {
           <button @click="${this.showPrev}">Show prev</button>
         </div>
         <div id="chart"></div>
-        <p>Number of good schedules: ${this.filteredSchedules.length - 1}</p>
+        <p>Number of good schedules: ${this.filteredSchedules.length}</p>
         <p>Currently displayed: ${this.indexToDisplay}</p>
       </div>
     `;
@@ -444,6 +468,10 @@ class shiftSchedule extends LitElement {
 customElements.define('shift-schedule', shiftSchedule);
 
 function getMaxQuality(schedules) {
+  if (schedules.length === 0) {
+    return { max: 0, min: 0 };
+  }
+
   let result = { max: {}, min: {} };
   for (let key in schedules[0][0].quality) {
     result.max[key] = 0;
