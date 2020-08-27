@@ -24,18 +24,6 @@ test('Overtime 0', () => {
       },
     })
   ).toBe(8464);
-
-  expect(
-    qualityWorkingHours({
-      information: {
-        plannedWorkingTime: 192,
-        overtime: 0,
-      },
-      schedulingInformation: {
-        hoursWorked: 172.8,
-      },
-    })
-  ).toBeCloseTo(2);
 });
 
 test('Overtime positive', () => {

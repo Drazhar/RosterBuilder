@@ -51,11 +51,31 @@ class WishesView extends LitElement {
     this.requestUpdate();
   }
 
+  vacationChanged(event) {
+    let employeeIndex = event.path[0].id.split('_');
+    const vacIndex = parseInt(employeeIndex.pop());
+    employeeIndex = parseInt(employeeIndex[0]);
+    const changedValue = event.path[0].value;
+
+    this.employees[employeeIndex].shiftVacation[vacIndex] = changedValue;
+    this.requestUpdate();
+  }
+
   clearWishes(e) {
     e.preventDefault();
     for (let iE = 0; iE < this.employees.length; iE++) {
       for (let iW = 0; iW < this.employees[iE].shiftWishes.length; iW++) {
         this.employees[iE].shiftWishes[iW] = 0;
+      }
+    }
+    this.requestUpdate();
+  }
+
+  clearVacation(e) {
+    e.preventDefault();
+    for (let iE = 0; iE < this.employees.length; iE++) {
+      for (let iV = 0; iV < this.employees[iE].shiftVacation.length; iV++) {
+        this.employees[iE].shiftVacation[iV] = 0;
       }
     }
     this.requestUpdate();
@@ -136,15 +156,95 @@ class WishesView extends LitElement {
                             ${this.shifts.map((shift) => {
                               if (wish === shift.id) {
                                 return html`
-                                  <option value="${shift.id}" selected
-                                    >${shift.name}</option
-                                  >
+                                  <option value="${shift.id}" selected>
+                                    ${shift.name}
+                                  </option>
                                 `;
                               } else {
                                 return html`
-                                  <option value="${shift.id}"
-                                    >${shift.name}</option
-                                  >
+                                  <option value="${shift.id}">
+                                    ${shift.name}
+                                  </option>
+                                `;
+                              }
+                            })}
+                          </select>
+                        </td>
+                      `;
+                    })}
+                  </tr>`
+              )}
+            </tbody>
+          </table>
+        </fieldset>
+
+        <fieldset>
+          <legend>Vacation</legend>
+          <table>
+            <col span="1" class="fixedWidth" />
+            ${this.dateArray.map((item, index) => {
+              if (item === 0 || item === 6) {
+                return html`<col
+                  span="1"
+                  style="background-color:lightgrey"
+                />`;
+              } else if (item === 1) {
+                return html`<col span="5" />`;
+              } else if (index === 0) {
+                return html`<col span="${6 - item}" />`;
+              }
+            })}
+            <thead>
+              <tr>
+                <th>
+                  <button @click="${this.clearVacation}">Clear all</button>
+                </th>
+                ${this.dateArray.map((day, index) => {
+                  newDay.setDate(startDate.getDate() + index);
+                  let dateString = newDay.toDateString().split(' ');
+                  dateString.pop();
+                  dateString = dateString.join(' ');
+                  return html`<th>
+                    ${dateString.split(' ')[0]}<br />
+                    ${dateString.split(' ')[2]} ${dateString.split(' ')[1]}
+                  </th>`;
+                })}
+              </tr>
+            </thead>
+            <tbody>
+              ${this.employees.map(
+                (employee, employeeIndex) =>
+                  html`<tr>
+                    <th>${employee.name}</th>
+                    ${employee.shiftVacation.map((wish, wishIndex) => {
+                      return html`
+                        <td
+                          class="${parseInt(wish) !== 0
+                            ? 'enteredWish'
+                            : 'noWish'}"
+                        >
+                          <select
+                            id="${employeeIndex}_${wishIndex}"
+                            @change=${this.vacationChanged}
+                          >
+                            ${parseInt(wish) === 0
+                              ? html`<option value="0" selected>none</option>`
+                              : html`<option value="0">none</option>`}
+                            ${wish === ' '
+                              ? html`<option value=" " selected>free</option>`
+                              : html`<option value=" ">free</option>`}
+                            ${this.shifts.map((shift) => {
+                              if (wish === shift.id) {
+                                return html`
+                                  <option value="${shift.id}" selected>
+                                    ${shift.name}
+                                  </option>
+                                `;
+                              } else {
+                                return html`
+                                  <option value="${shift.id}">
+                                    ${shift.name}
+                                  </option>
                                 `;
                               }
                             })}
@@ -166,7 +266,7 @@ class WishesView extends LitElement {
       fieldset {
         display: flex;
         flex-direction: column;
-        background-color: white;
+        background-color: rgba(255, 255, 255, 0.6);
       }
 
       .wrapper {

@@ -8,6 +8,7 @@ const {
 const { findBestSchedules } = require('./functions/findBestSchedules');
 const { getQualityWeekends } = require('./functions/qualityWeekends');
 const { getQualityWishes } = require('./functions/qualityWishes');
+const { getQualityVacation } = require('./functions/qualityVacation');
 
 function runScheduler(
   iterations = 1,
@@ -41,6 +42,7 @@ function runScheduler(
     weekendDistribution: Infinity,
     weekendNonstop: Infinity,
     wishFulfillment: Infinity,
+    vacationFulfillment: Infinity,
   };
   let targetWeights = {
     totalHourDifference: 1,
@@ -50,6 +52,7 @@ function runScheduler(
     weekendDistribution: 0.5,
     weekendNonstop: 1,
     wishFulfillment: 0.1,
+    vacationFulfillment: 100,
   };
   const numberOfDays = dateArray.length; // This should be set outside of the function later.
 
@@ -100,6 +103,10 @@ function runScheduler(
       qualityWeekendsObj.weekendNonstop;
 
     createdSchedules[i][0].quality.wishFulfillment = getQualityWishes(
+      createdSchedules[i]
+    );
+
+    createdSchedules[i][0].quality.vacationFulfillment = getQualityVacation(
       createdSchedules[i]
     );
 
@@ -220,6 +227,7 @@ function obtainInformation(inputSchedule, shiftInformation, currentDay) {
 
     reduceProbabilityForHighWorkload(employee);
     adjustProbabilityEmployeeWishes(employee, currentDay);
+    adjustProbabilityEmployeeVacation(employee, currentDay);
   });
 }
 
@@ -367,7 +375,7 @@ function adjustProbabilityEmployeeWishes(employee, currentDay) {
       i < employee.schedulingInformation.possibleShifts.length;
       i++
     ) {
-      employee.schedulingInformation.possibleShifts[i] *= 0.2;
+      employee.schedulingInformation.possibleShifts[i] *= 0.1;
     }
   } else if (employee.information.shiftWishes[currentDay] != 0) {
     for (let i = 1; i < employee.schedulingInformation.shift.map.length; i++) {
@@ -375,7 +383,29 @@ function adjustProbabilityEmployeeWishes(employee, currentDay) {
         employee.schedulingInformation.shift.map[i] ==
         employee.information.shiftWishes[currentDay]
       ) {
-        employee.schedulingInformation.possibleShifts[i] *= 5;
+        employee.schedulingInformation.possibleShifts[i] *= 10;
+      }
+    }
+  }
+}
+
+function adjustProbabilityEmployeeVacation(employee, currentDay) {
+  if (employee.information.shiftVacation[currentDay] === ' ') {
+    // Employee wants a day off
+    for (
+      let i = 0;
+      i < employee.schedulingInformation.possibleShifts.length;
+      i++
+    ) {
+      employee.schedulingInformation.possibleShifts[i] *= 0.0001;
+    }
+  } else if (employee.information.shiftVacation[currentDay] != 0) {
+    for (let i = 1; i < employee.schedulingInformation.shift.map.length; i++) {
+      if (
+        employee.schedulingInformation.shift.map[i] ==
+        employee.information.shiftVacation[currentDay]
+      ) {
+        employee.schedulingInformation.possibleShifts[i] *= 10000;
       }
     }
   }
@@ -399,6 +429,7 @@ function initializeSchedule(employeeInformation) {
         },
         minConsecutiveDaysOff: employee.minConsecutiveDaysOff,
         shiftWishes: employee.shiftWishes,
+        shiftVacation: employee.shiftVacation,
       },
       schedulingInformation: {
         hoursWorked: 0,
