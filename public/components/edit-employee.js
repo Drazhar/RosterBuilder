@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit-element';
 import { nanoid } from 'nanoid';
 import { randomAvataaarURL } from '../src/randomAvataaarURL';
+import { MDCSelect } from '@material/select';
 
 class EditEmployee extends LitElement {
   static get properties() {
@@ -145,30 +146,48 @@ class EditEmployee extends LitElement {
               </label>
             </fieldset>
             <fieldset>
-              <legend>
-                Shift options:
-              </legend>
-              ${this.shifts.length > 0
-                ? this.shifts.map(
-                    (shift) => html`<label
-                      >${shift.name}:
-                      <input
-                        type="number"
-                        id="${shift.id}_weight"
-                        value="${this.employee.shift[shift.id]}"
-                        isRequired
-                      />
-                    </label>`
-                  )
-                : html`<p>There are no shifts defined...</p>`}
+              <legend>Shift options:</legend>
+              ${
+                this.shifts.length > 0
+                  ? this.shifts.map(
+                      (shift) => html`<label
+                        >${shift.name}:
+                        <input
+                          type="number"
+                          id="${shift.id}_weight"
+                          value="${this.employee.shift[shift.id]}"
+                          isRequired
+                        />
+                      </label>`
+                    )
+                  : html`<p>There are no shifts defined...</p>`
+              }
             </fieldset>
             <fieldset>
-              <legend>
-                Wished and vacation:
-              </legend>
-              <button @click="${this.editShiftWishes}">
-                Define shift wishes
-              </button>
+              <legend>Recent assignment:</legend>
+              <div class="mdc-select mdc-select--filled demo-width-class">
+              <div class="mdc-select__anchor">
+                <span class="mdc-select__ripple"></span>
+                <span class="mdc-select__selected-text"></span>
+                <span class="mdc-select__dropdown-icon">
+                  <svg
+                      class="mdc-select__dropdown-icon-graphic"
+                      viewBox="7 10 10 5">
+                    <polygon
+                        class="mdc-select__dropdown-icon-inactive"
+                        stroke="none"
+                        points="7 10 12 15 17 10">
+                    </polygon>
+                    <polygon
+                        class="mdc-select__dropdown-icon-active"
+                        stroke="none"
+                        points="7 15 12 10 17 15">
+                    </polygon>
+                  </svg>
+                </span>
+                <span class="mdc-floating-label">Pick a Food Group</span>
+                <span class="mdc-line-ripple"></span>
+              </div>
             </fieldset>
             <button
               type="submit"

@@ -76,6 +76,7 @@ class EmployeesView extends LitElement {
         shift: setDefaultShiftDist(this.shifts),
         avatar: randomAvataaarURL(newId),
         shiftWishes: new Array(this.dateArray.length).fill(0),
+        shiftVacation: new Array(this.dateArray.length).fill(0),
       },
     ];
     this.openEditEmployee({ detail: { id: newId } });
@@ -141,9 +142,7 @@ class EmployeesView extends LitElement {
               @edit-me="${this.openEditEmployee}"
             ></employee-card>`
         )}
-        <div @click="${this.addNewEmployee}" class="addNew">
-          +
-        </div>
+        <div @click="${this.addNewEmployee}" class="addNew">+</div>
       </div>
     `;
   }

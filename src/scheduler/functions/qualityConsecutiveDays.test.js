@@ -161,3 +161,19 @@ test('Occuring Error during development', () => {
 
   expect(result[0]).toBeGreaterThan(0);
 });
+
+test('Occuring Error during development 02', () => {
+  let result = qualityConsecutiveDays({
+    information: {
+      consecutiveWorkingDays: {
+        min: 2,
+        max: 5,
+        preferred: 4,
+      },
+      minConsecutiveDaysOff: 2,
+    },
+    assignedShifts: [2, 2, 0, 0, 1, 0],
+  });
+
+  expect(result[1]).toBeGreaterThan(0);
+});
