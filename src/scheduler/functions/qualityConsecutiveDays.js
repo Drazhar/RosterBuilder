@@ -15,6 +15,18 @@ function qualityConsecutiveDays(employee) {
   let currentDaysOff = 0;
   let currentDaysWorking = 0;
   employee.assignedShifts.forEach((workShift, index) => {
+    let lastShift = employee.assignedShifts[index - 1];
+
+    if (index === 0) {
+      lastShift = employee.information.initialAssignment.shift;
+      if (employee.information.initialAssignment.shift === ' ') {
+        currentDaysOff = employee.information.initialAssignment.numberOfDays;
+      } else {
+        currentDaysWorking =
+          employee.information.initialAssignment.numberOfDays;
+      }
+    }
+
     // This part is for minConsecutiveDaysOff
     if (workShift === 0) {
       currentDaysOff++;
@@ -32,8 +44,8 @@ function qualityConsecutiveDays(employee) {
     } else if (
       workShift !== 0 &&
       index > 0 &&
-      workShift !== employee.assignedShifts[index - 1] &&
-      employee.assignedShifts[index - 1] !== 0
+      workShift !== lastShift &&
+      lastShift !== 0
     ) {
       // Switched from one shift to another without a day off
       resultConsecutiveDaysOff++;
@@ -46,8 +58,8 @@ function qualityConsecutiveDays(employee) {
         resultConsecutiveWorkingDays +=
           ((currentDaysWorking -
             employee.information.consecutiveWorkingDays.preferred) *
-            2) **
-          2;
+            4) **
+          4;
       } else if (
         currentDaysWorking !==
         employee.information.consecutiveWorkingDays.preferred
@@ -72,12 +84,28 @@ function qualityConsecutiveDays(employee) {
       }
     }
     // At the end of the array, check for to many working days
-    if (currentDaysWorking > employee.information.consecutiveWorkingDays.max) {
-      resultConsecutiveWorkingDays +=
-        ((currentDaysWorking -
-          employee.information.consecutiveWorkingDays.preferred) *
-          2) **
-        2;
+    if (
+      employee.assignedShifts.length - 1 === index &&
+      currentDaysWorking > employee.information.consecutiveWorkingDays.preferred
+    ) {
+      if (
+        currentDaysWorking > employee.information.consecutiveWorkingDays.max
+      ) {
+        resultConsecutiveWorkingDays +=
+          ((currentDaysWorking -
+            employee.information.consecutiveWorkingDays.preferred) *
+            2) **
+          2;
+      } else {
+        let relativeDistance =
+          employee.information.consecutiveWorkingDays.max -
+          employee.information.consecutiveWorkingDays.preferred;
+        let difference = Math.abs(
+          currentDaysWorking -
+            employee.information.consecutiveWorkingDays.preferred
+        );
+        resultConsecutiveWorkingDays += difference / relativeDistance;
+      }
     }
 
     if (workShift !== 0) {

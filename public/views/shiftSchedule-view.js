@@ -207,9 +207,7 @@ class shiftSchedule extends LitElement {
                       `;
                     }
                   )}
-                  <td>
-                    ${item.schedulingInformation.hoursWorked}
-                  </td>
+                  <td>${item.schedulingInformation.hoursWorked}</td>
                 </tr>
               `;
             })}
@@ -223,17 +221,34 @@ class shiftSchedule extends LitElement {
                 <tr>
                   <td>${key}</td>
                   <td>
-                    ${Math.round(
-                      this.filteredSchedules[this.indexToDisplay][0].quality[
-                        key
-                      ] * 1000
-                    ) / 1000}
+                    <table class="qualityCells">
+                      <td>
+                        ${Math.round(
+                          this.filteredSchedules[this.indexToDisplay][0]
+                            .quality[key] * 1000
+                        ) / 1000}
+                      </td>
+                      <td>
+                        <input
+                          @input="${this.setFilter}"
+                          type="range"
+                          id="${key}"
+                          name="${key}"
+                          min="${this.maxQuality.min[key]}"
+                          max="${this.maxQuality.max[key]}"
+                          value="${this.scheduleFilters[key]}"
+                          step="any"
+                        />
+                      </td>
+                      <td>${Math.round(this.scheduleFilters[key])}</td>
+                    </table>
                   </td>
                 </tr>
               `;
             })}
           </tbody>
         </table>
+
         <div>
           <button @click="${this.btnCreateSchedule}">
             Start creating roster: ${this.isCreating}
@@ -243,25 +258,6 @@ class shiftSchedule extends LitElement {
           <button @click="${this.showPrev}">Show prev</button>
         </div>
         <div id="chart"></div>
-        <div class="filters">
-          ${Object.keys(this.maxQuality.max).map((key) => {
-            return html`
-              <label for="${key}"
-                >${key}: ${Math.round(this.scheduleFilters[key])}</label
-              >
-              <input
-                @change="${this.setFilter}"
-                type="range"
-                id="${key}"
-                name="${key}"
-                min="${this.maxQuality.min[key]}"
-                max="${this.maxQuality.max[key]}"
-                value="${this.scheduleFilters[key]}"
-                step="any"
-              />
-            `;
-          })}
-        </div>
         <p>Number of good schedules: ${this.filteredSchedules.length - 1}</p>
         <p>Currently displayed: ${this.indexToDisplay}</p>
       </div>
@@ -305,6 +301,10 @@ class shiftSchedule extends LitElement {
         opacity: 0.85;
         overflow: hidden;
         white-space: nowrap;
+      }
+
+      .qualityCells td {
+        border: none;
       }
 
       td:hover {

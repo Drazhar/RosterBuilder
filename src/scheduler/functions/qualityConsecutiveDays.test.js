@@ -9,6 +9,10 @@ test('Consecutive Days off: Good', () => {
         preferred: 4,
       },
       minConsecutiveDaysOff: 2,
+      initialAssignment: {
+        shift: ' ',
+        numberOfDays: 5,
+      },
     },
     assignedShifts: [1, 1, 1, 1, 0, 0, 0, 2, 2, 2, 2, 0, 0, 0, 0, 2],
   });
@@ -26,6 +30,10 @@ test('Consecutive Days off: Bad', () => {
         preferred: 4,
       },
       minConsecutiveDaysOff: 2,
+      initialAssignment: {
+        shift: ' ',
+        numberOfDays: 5,
+      },
     },
     assignedShifts: [1, 1, 1, 1, 0, 2, 2, 2, 2, 0, 0, 0],
   });
@@ -42,12 +50,16 @@ test('Consecutive Working Days: Below min', () => {
         preferred: 4,
       },
       minConsecutiveDaysOff: 2,
+      initialAssignment: {
+        shift: ' ',
+        numberOfDays: 5,
+      },
     },
     assignedShifts: [1, 0, 0],
   });
 
   expect(result[0]).toBeCloseTo(0);
-  expect(result[1]).toBeCloseTo(36);
+  expect(result[1]).toBeGreaterThan(36);
 });
 
 test('Consecutive Working Days: Below preferred', () => {
@@ -59,6 +71,10 @@ test('Consecutive Working Days: Below preferred', () => {
         preferred: 4,
       },
       minConsecutiveDaysOff: 2,
+      initialAssignment: {
+        shift: ' ',
+        numberOfDays: 5,
+      },
     },
     assignedShifts: [1, 1, 0],
   });
@@ -74,6 +90,10 @@ test('Consecutive Working Days: Below preferred', () => {
         preferred: 4,
       },
       minConsecutiveDaysOff: 2,
+      initialAssignment: {
+        shift: ' ',
+        numberOfDays: 5,
+      },
     },
     assignedShifts: [1, 1, 1, 0],
   });
@@ -92,6 +112,10 @@ test('Consecutive Working Days: Above max', () => {
         preferred: 4,
       },
       minConsecutiveDaysOff: 2,
+      initialAssignment: {
+        shift: ' ',
+        numberOfDays: 5,
+      },
     },
     assignedShifts: [1, 1, 1, 1, 1, 1, 1, 0],
   });
@@ -107,6 +131,10 @@ test('Consecutive Working Days: Above max', () => {
         preferred: 4,
       },
       minConsecutiveDaysOff: 2,
+      initialAssignment: {
+        shift: ' ',
+        numberOfDays: 5,
+      },
     },
     assignedShifts: [1, 1, 1, 1, 1, 1, 1],
   });
@@ -124,6 +152,10 @@ test('Occuring Error during development', () => {
         preferred: 4,
       },
       minConsecutiveDaysOff: 2,
+      initialAssignment: {
+        shift: ' ',
+        numberOfDays: 5,
+      },
     },
     assignedShifts: [
       0,
@@ -162,7 +194,7 @@ test('Occuring Error during development', () => {
   expect(result[0]).toBeGreaterThan(0);
 });
 
-test('Occuring Error during development 02', () => {
+test('Initial shift considered: Good', () => {
   let result = qualityConsecutiveDays({
     information: {
       consecutiveWorkingDays: {
@@ -171,9 +203,13 @@ test('Occuring Error during development 02', () => {
         preferred: 4,
       },
       minConsecutiveDaysOff: 2,
+      initialAssignment: {
+        shift: 1,
+        numberOfDays: 1,
+      },
     },
-    assignedShifts: [2, 2, 0, 0, 1, 0],
+    assignedShifts: [1, 1, 1, 1],
   });
-
-  expect(result[1]).toBeGreaterThan(0);
+  expect(result[0]).toBeCloseTo(0);
+  expect(result[1]).toBeCloseTo(1);
 });

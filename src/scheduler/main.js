@@ -430,12 +430,16 @@ function initializeSchedule(employeeInformation) {
         minConsecutiveDaysOff: employee.minConsecutiveDaysOff,
         shiftWishes: employee.shiftWishes,
         shiftVacation: employee.shiftVacation,
+        initialAssignment: {
+          shift: employee.recentAssignment.shift,
+          numberOfDays: employee.recentAssignment.numberOfDays,
+        },
       },
       schedulingInformation: {
         hoursWorked: 0,
         recentAssignment: {
-          shift: 0,
-          numberOfDays: 5,
+          shift: employee.recentAssignment.shift,
+          numberOfDays: employee.recentAssignment.numberOfDays,
         },
         shift: {
           plannedDistribution: parsedShiftInfo.plannedDistribution,

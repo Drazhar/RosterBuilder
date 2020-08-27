@@ -77,6 +77,7 @@ class EmployeesView extends LitElement {
         avatar: randomAvataaarURL(newId),
         shiftWishes: new Array(this.dateArray.length).fill(0),
         shiftVacation: new Array(this.dateArray.length).fill(0),
+        recentAssignment: { shift: 0, numberOfDays: 4 },
       },
     ];
     this.openEditEmployee({ detail: { id: newId } });

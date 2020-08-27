@@ -1,7 +1,6 @@
 import { LitElement, html, css } from 'lit-element';
 import { nanoid } from 'nanoid';
 import { randomAvataaarURL } from '../src/randomAvataaarURL';
-import { MDCSelect } from '@material/select';
 
 class EditEmployee extends LitElement {
   static get properties() {
@@ -48,6 +47,20 @@ class EditEmployee extends LitElement {
         `${shift.id}_weight`
       ).value;
     });
+
+    const recentShiftString = this.shadowRoot.getElementById('recentShift')
+      .value;
+    for (let i = 0; i < this.shifts.length; i++) {
+      console.log('recentshift', recentShiftString);
+      console.log('this', this.shifts[i].id);
+      if (this.shifts[i].id === recentShiftString) {
+        this.employee.recentAssignment.shift = i + 1;
+        break;
+      }
+    }
+    this.employee.recentAssignment.numberOfDays = parseInt(
+      this.shadowRoot.getElementById('recentNumberOfDays').value
+    );
 
     // Dispatch event with this employee object to save it to the database or local storage
     this.dispatchEvent(
@@ -165,29 +178,40 @@ class EditEmployee extends LitElement {
             </fieldset>
             <fieldset>
               <legend>Recent assignment:</legend>
-              <div class="mdc-select mdc-select--filled demo-width-class">
-              <div class="mdc-select__anchor">
-                <span class="mdc-select__ripple"></span>
-                <span class="mdc-select__selected-text"></span>
-                <span class="mdc-select__dropdown-icon">
-                  <svg
-                      class="mdc-select__dropdown-icon-graphic"
-                      viewBox="7 10 10 5">
-                    <polygon
-                        class="mdc-select__dropdown-icon-inactive"
-                        stroke="none"
-                        points="7 10 12 15 17 10">
-                    </polygon>
-                    <polygon
-                        class="mdc-select__dropdown-icon-active"
-                        stroke="none"
-                        points="7 15 12 10 17 15">
-                    </polygon>
-                  </svg>
-                </span>
-                <span class="mdc-floating-label">Pick a Food Group</span>
-                <span class="mdc-line-ripple"></span>
-              </div>
+              <label for="recentShift"
+                >Shift:
+                <select id="recentShift">
+                  ${
+                    this.employee.recentAssignment.shift === 0
+                      ? html`<option value=" " selected>free</option>`
+                      : html`<option value=" ">free</option>`
+                  }
+                  ${this.shifts.map((shift, index) => {
+                    if (this.employee.recentAssignment.shift - 1 === index) {
+                      return html`
+                        <option value="${shift.id}" selected>
+                          ${shift.name}
+                        </option>
+                      `;
+                    } else {
+                      return html`
+                        <option value="${shift.id}">${shift.name}</option>
+                      `;
+                    }
+                  })}
+                </select>
+              </label>
+
+              <label for="recentNumberOfDays"
+                >Number of days:
+                <input
+                      type="number"
+                      id="recentNumberOfDays"
+                      value="${this.employee.recentAssignment.numberOfDays}"
+                      isRequired
+                    />
+                </select>
+              </label>
             </fieldset>
             <button
               type="submit"
