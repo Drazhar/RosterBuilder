@@ -3,6 +3,7 @@ import { scheduleConverter } from '../src/scheduleConverter';
 import * as d3 from 'd3';
 import { findIndexOfBest } from '../src/findIndexOfBest';
 import { getDateArr } from '../src/getDateArr';
+import Worker from 'worker-loader!../src/schedulerSRC/worker/scheduler.worker.js';
 
 class shiftSchedule extends LitElement {
   static get properties() {
@@ -92,31 +93,19 @@ class shiftSchedule extends LitElement {
   }
 
   async btnCreateSchedule() {
-    this.isCreating = true;
-    let isFirst = true;
-    while (this.isCreating) {
-      let lastBest = [];
-      if (!isFirst) {
-        lastBest = this.scheduleToDisplay;
-      }
+    if (!this.isCreating) {
+      this.isCreating = true;
 
-      const createdSchedule = await this.createSchedule(lastBest);
-      if (createdSchedule.status === 'success') {
-        // console.log(createdSchedule.result);
-        this.scheduleToDisplay = createdSchedule.result;
-        localStorage.setItem(
-          'lastSchedule',
-          JSON.stringify(this.scheduleToDisplay)
-        );
-      }
-      isFirst = false;
-      this.indexToDisplay = findIndexOfBest(this.filteredSchedules);
-      this.maxQuality = getMaxQuality(this.scheduleToDisplay);
-      this.requestUpdate();
+      this.myWorker = new Worker();
+      await this.createSchedule(true, []);
     }
   }
 
-  async createSchedule(lastBest) {
+  async createSchedule(isFirst, lastBest) {
+    if (!isFirst) {
+      lastBest = this.scheduleToDisplay;
+    }
+
     const data = {
       iterations: 50000,
       employees: JSON.parse(window.localStorage.getItem('definedEmployees')),
@@ -124,13 +113,26 @@ class shiftSchedule extends LitElement {
       lastBest,
       dateArray: this.dateArray,
     };
-    const response = await fetch(`http://127.0.0.1:3000/api/createSchedule`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-    });
-    const json = await response.json();
-    return json;
+
+    this.myWorker.postMessage(data);
+
+    this.myWorker.onmessage = (e) => {
+      this.scheduleToDisplay = e.data;
+      localStorage.setItem(
+        'lastSchedule',
+        JSON.stringify(this.scheduleToDisplay)
+      );
+
+      this.indexToDisplay = findIndexOfBest(this.filteredSchedules);
+      this.maxQuality = getMaxQuality(this.scheduleToDisplay);
+      this.requestUpdate();
+
+      if (this.isCreating) {
+        this.createSchedule(false, e.data);
+      } else {
+        this.myWorker.terminate();
+      }
+    };
   }
 
   setFilter(event) {
@@ -144,6 +146,13 @@ class shiftSchedule extends LitElement {
       return true;
     });
     this.indexToDisplay = findIndexOfBest(this.filteredSchedules);
+  }
+
+  disconnectedCallback() {
+    if (this.myWorker) {
+      this.myWorker.terminate();
+    }
+    super.disconnectedCallback();
   }
 
   render() {
