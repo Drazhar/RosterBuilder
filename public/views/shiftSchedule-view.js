@@ -17,6 +17,7 @@ class shiftSchedule extends LitElement {
       scheduleFilters: { type: Object },
       filteredSchedules: { type: Object },
       settings: { type: Object },
+      employees: { type: Object },
     };
   }
 
@@ -25,33 +26,23 @@ class shiftSchedule extends LitElement {
 
     this.scheduleFilters = {};
     this.indexToDisplay = 0;
-    this.isCreating = 0;
+
+    this.employees = JSON.parse(
+      window.localStorage.getItem('definedEmployees')
+    );
 
     if (localStorage.getItem('lastSchedule') !== null) {
       this.scheduleToDisplay = JSON.parse(localStorage.getItem('lastSchedule'));
     } else {
       this.scheduleToDisplay = [
-        [
-          {
-            assignedShifts: [' '],
-            information: { name: 'empty' },
-            schedulingInformation: { hoursWorked: 0 },
-            quality: { minConsecutiveDaysOffCheck: 0 },
-          },
-        ],
+        {
+          quality: { qualityRating: 1, secondRating: 2 },
+          assignedShifts: [[1, 1, 1, 1, 0, 0, 0]],
+        },
       ];
     }
 
-    this.filteredSchedules = this.scheduleToDisplay.filter((item) => {
-      for (let key in this.scheduleFilters) {
-        if (item[0].quality[key] > this.scheduleFilters[key]) {
-          return false;
-        }
-      }
-      return true;
-    });
-
-    this.maxQuality = getMaxQuality(this.scheduleToDisplay);
+    this.filteredSchedules = this.scheduleToDisplay;
 
     if (window.localStorage.getItem('definedShifts') === null) {
       this.shifts = [];
@@ -93,24 +84,15 @@ class shiftSchedule extends LitElement {
   }
 
   async btnCreateSchedule() {
-    if (!this.isCreating) {
-      this.isCreating = true;
+    this.myWorker = new Worker();
 
-      this.myWorker = new Worker();
-      await this.createSchedule(true, []);
-    }
+    await this.createSchedule();
   }
 
-  async createSchedule(isFirst, lastBest) {
-    if (!isFirst) {
-      lastBest = this.scheduleToDisplay;
-    }
-
+  async createSchedule() {
     const data = {
-      iterations: 50000,
-      employees: JSON.parse(window.localStorage.getItem('definedEmployees')),
+      employees: this.employees,
       shifts: this.shifts,
-      lastBest,
       dateArray: this.dateArray,
     };
 
@@ -123,27 +105,13 @@ class shiftSchedule extends LitElement {
         JSON.stringify(this.scheduleToDisplay)
       );
 
-      this.indexToDisplay = findIndexOfBest(this.filteredSchedules);
-      this.maxQuality = getMaxQuality(this.scheduleToDisplay);
+      this.indexToDisplay = 0;
 
-      if (this.scheduleToDisplay.length > 0) {
-        this.filteredSchedules = this.scheduleToDisplay.filter((item) => {
-          for (let key in this.scheduleFilters) {
-            if (item[0].quality[key] > this.scheduleFilters[key]) {
-              return false;
-            }
-          }
-          return true;
-        });
-      }
+      this.filteredSchedules = this.scheduleToDisplay;
 
       this.requestUpdate();
 
-      if (this.isCreating) {
-        this.createSchedule(false, e.data);
-      } else {
-        this.myWorker.terminate();
-      }
+      this.myWorker.terminate();
     };
   }
 
@@ -181,7 +149,6 @@ class shiftSchedule extends LitElement {
               return html`<col span="${6 - item}" />`;
             }
           })}
-          <col span="1" class="fixedWidth" />
           <thead>
             <tr>
               <th></th>
@@ -189,108 +156,64 @@ class shiftSchedule extends LitElement {
                 let day = this.startDate.getDate() + index;
                 return html`<th>${day}.</th>`;
               })}
-              <th>diff / new OT</th>
             </tr>
           </thead>
           <tbody>
-            ${this.filteredSchedules.length === 0
+            ${this.filteredSchedules.length == 0
               ? ''
-              : this.filteredSchedules[this.indexToDisplay].map((item) => {
-                  return html`
-                    <tr>
-                      <th class="employeeNames">${item.information.name}</th>
-                      ${scheduleConverter(item.assignedShifts, this.shifts).map(
-                        (assigned) => {
-                          return html`
-                            <td
-                              colspan=${assigned.count}
-                              style="${this.shifts.filter(
-                                (item) => item.id === assigned.value
-                              ).length > 0
-                                ? `background-color:#${
-                                    this.shifts.filter(
+              : this.filteredSchedules[this.indexToDisplay].assignedShifts.map(
+                  (item, index) => {
+                    return html`
+                      <tr>
+                        <th class="employeeNames">
+                          ${this.employees[index].name}
+                        </th>
+                        ${scheduleConverter(item, this.shifts).map(
+                          (assigned) => {
+                            return html`
+                              <td
+                                colspan=${assigned.count}
+                                style="${this.shifts.filter(
+                                  (item) => item.id === assigned.value
+                                ).length > 0
+                                  ? `background-color:#${
+                                      this.shifts.filter(
+                                        (item) => item.id === assigned.value
+                                      )[0].colors.backgroundColor
+                                    }; color:#${
+                                      this.shifts.filter(
+                                        (item) => item.id === assigned.value
+                                      )[0].colors.textColor
+                                    }`
+                                  : ''}"
+                              >
+                                ${this.shifts.filter(
+                                  (item) => item.id === assigned.value
+                                ).length > 0
+                                  ? this.shifts.filter(
                                       (item) => item.id === assigned.value
-                                    )[0].colors.backgroundColor
-                                  }; color:#${
-                                    this.shifts.filter(
-                                      (item) => item.id === assigned.value
-                                    )[0].colors.textColor
-                                  }`
-                                : ''}"
-                            >
-                              ${this.shifts.filter(
-                                (item) => item.id === assigned.value
-                              ).length > 0
-                                ? this.shifts.filter(
-                                    (item) => item.id === assigned.value
-                                  )[0].name +
-                                  ' ' +
-                                  assigned.count
-                                : ''}
-                            </td>
-                          `;
-                        }
-                      )}
-                      <td>
-                        ${item.schedulingInformation.hoursWorked -
-                        item.information.plannedWorkingTime}
-                        /
-                        ${item.information.overtime +
-                        item.schedulingInformation.hoursWorked -
-                        item.information.plannedWorkingTime}
-                      </td>
-                    </tr>
-                  `;
-                })}
-          </tbody>
-        </table>
-
-        <table>
-          <tbody>
-            ${Object.keys(this.maxQuality.max).map((key) => {
-              return html`
-                <tr>
-                  <td>${key}</td>
-                  <td>
-                    <table class="qualityCells">
-                      <td>
-                        ${this.filteredSchedules.length === 0
-                          ? 0
-                          : Math.round(
-                              this.filteredSchedules[this.indexToDisplay][0]
-                                .quality[key] * 1000
-                            ) / 1000}
-                      </td>
-                      <td>
-                        <input
-                          @input="${this.setFilter}"
-                          type="range"
-                          id="${key}"
-                          name="${key}"
-                          min="${this.maxQuality.min[key]}"
-                          max="${this.maxQuality.max[key]}"
-                          value="${this.scheduleFilters[key]}"
-                          step="any"
-                        />
-                      </td>
-                      <td>${Math.round(this.scheduleFilters[key])}</td>
-                    </table>
-                  </td>
-                </tr>
-              `;
-            })}
+                                    )[0].name +
+                                    ' ' +
+                                    assigned.count
+                                  : ''}
+                              </td>
+                            `;
+                          }
+                        )}
+                      </tr>
+                    `;
+                  }
+                )}
           </tbody>
         </table>
 
         <div>
           <button @click="${this.btnCreateSchedule}">
-            Start creating roster: ${this.isCreating}
+            Start creating roster
           </button>
-          <button @click="${this.btnStopCreate}">Stop creating</button>
           <button @click="${this.showNext}">Show next</button>
           <button @click="${this.showPrev}">Show prev</button>
         </div>
-        <div id="chart"></div>
         <p>Number of good schedules: ${this.filteredSchedules.length}</p>
         <p>Currently displayed: ${this.indexToDisplay}</p>
       </div>
@@ -390,104 +313,6 @@ class shiftSchedule extends LitElement {
       }
     `;
   }
-
-  updated() {
-    this.createChart();
-  }
-
-  createChart() {
-    // Extract the data into clean arrays
-    let data = [];
-    let id = 0;
-    this.filteredSchedules.forEach((schedule) => {
-      data.push({
-        id,
-        x: schedule[0].quality.totalHourDifference,
-        y: schedule[0].quality.shiftDistribution,
-        color: schedule[0].quality.consecutiveWorkingDays,
-      });
-      id++;
-    });
-
-    const width = 800;
-    const height = 400;
-
-    const chartArea = this.shadowRoot.getElementById('chart');
-    chartArea.innerHTML = ''; // delete old chart
-
-    // Create the chart itself
-    const svg = d3
-      .select(chartArea)
-      .append('svg')
-      .attr('width', width)
-      .attr('height', height);
-    // Scales
-    const x = d3
-      .scaleLinear()
-      .range([0, width])
-      .domain([0, d3.max(data, (d) => d.x)]);
-    const y = d3
-      .scaleLinear()
-      .range([height, 0])
-      .domain([0, d3.max(data, (d) => d.y)]);
-    const colorRating = d3
-      .scaleLinear()
-      .range([0, 255])
-      .domain([0, d3.max(data, (d) => d.color)]);
-
-    // Dots there are
-    svg
-      .selectAll('dot')
-      .data(data)
-      .enter()
-      .append('circle')
-      .attr('r', (d) => (d.id === this.indexToDisplay ? 8 : 5))
-      .attr('cx', (d) => x(d.x))
-      .attr('cy', (d) => y(d.y))
-      .attr('fill', (d) =>
-        d.id === this.indexToDisplay
-          ? `RGB(18, 170, 236)`
-          : `RGB(${colorRating(d.color)},0,0)`
-      )
-      .on('click', (d, i) => {
-        this.showIndex(i);
-      })
-      .attr('class', 'chartPoint')
-      .append('svg:title')
-      .text((d, i) => `index: ${i} x: ${d.x}   y: ${d.y}`);
-
-    // Creating the axis
-    svg
-      .append('g')
-      .attr('transform', 'translate(0,' + height + ')')
-      .call(d3.axisTop(x).ticks(10));
-    svg.append('svg').call(d3.axisRight(y).ticks(5));
-  }
 }
 
 customElements.define('shift-schedule', shiftSchedule);
-
-function getMaxQuality(schedules) {
-  if (schedules.length === 0) {
-    return { max: 0, min: 0 };
-  }
-
-  let result = { max: {}, min: {} };
-  for (let key in schedules[0][0].quality) {
-    result.max[key] = 0;
-    result.min[key] = Infinity;
-  }
-
-  for (let i = 0; i < schedules.length; i++) {
-    for (let key in schedules[i][0].quality) {
-      if (schedules[i][0].quality[key] > result.max[key]) {
-        result.max[key] = schedules[i][0].quality[key];
-      }
-      if (schedules[i][0].quality[key] < result.min[key]) {
-        result.min[key] = schedules[i][0].quality[key];
-      }
-    }
-  }
-
-  return result;
-}

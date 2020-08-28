@@ -1,21 +1,13 @@
-import { runScheduler } from '../scheduler/main.js';
+import { runScheduler } from '../scheduler/DFS.js';
 
 onmessage = (e) => {
   let result = work(e.data);
 
-  result.then((res) => {
-    postMessage(res);
-  });
+  return result;
 };
 
-async function work(data) {
-  let result = await runScheduler(
-    data.iterations,
-    data.employees,
-    data.shifts,
-    data.dateArray,
-    data.lastBest
-  );
+function work(data) {
+  let result = runScheduler(data.employees, data.shifts, data.dateArray);
 
   return result;
 }
