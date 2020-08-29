@@ -86,8 +86,6 @@ class shiftSchedule extends LitElement {
   async btnCreateSchedule() {
     this.myWorker = new Worker();
 
-    console.log('shiftInformation', this.shifts);
-
     await this.createSchedule();
   }
 

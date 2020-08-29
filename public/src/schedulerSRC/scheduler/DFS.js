@@ -2,6 +2,8 @@ import { cloneDeep } from 'lodash';
 import { validWorkingHours } from './valid_checks/workingHours';
 import { validConsecutiveDays } from './valid_checks/consecutiveDays';
 import { validShiftOccupation } from './valid_checks/shiftOccupation';
+import { validAllShiftsOccupied } from './valid_checks/allShiftsOccupied';
+import { validNonStopWeekend } from './valid_checks/nonStopWeekend';
 
 export function runScheduler(employeeInformation, shiftInformation, dateArray) {
   shiftInformation.unshift({ id: ' ', name: ' ' });
@@ -51,8 +53,6 @@ export function runScheduler(employeeInformation, shiftInformation, dateArray) {
   while (!isFinished) {
     wipPlan[employee][day]++;
 
-    // Check if it should backtrack, assigns unvisited value (-1) and push
-    // wipPlan to the result if finished.
     let shouldBacktrack = false;
     if (wipPlan[employee][day] >= shiftCount) {
       shouldBacktrack = true;
@@ -76,9 +76,24 @@ export function runScheduler(employeeInformation, shiftInformation, dateArray) {
       if (!validConsecutiveDays(day, employee, wipPlan, employeeInformation))
         continue;
 
+      if (dateArray[day] === 0 && day > 0) {
+        if (
+          !validNonStopWeekend(
+            wipPlan[employee][day],
+            wipPlan[employee][day - 1]
+          )
+        )
+          continue;
+      }
+
       if (employee > 0) {
         if (!validShiftOccupation(day, employee, wipPlan, shiftInformation))
           continue;
+
+        if (employee == employeeCount - 1) {
+          if (!validAllShiftsOccupied(day, employee, wipPlan, shiftInformation))
+            continue;
+        }
       }
 
       if (employee == employeeCount - 1 && day == dayCount - 1) {
