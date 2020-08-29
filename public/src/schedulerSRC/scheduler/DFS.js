@@ -1,6 +1,7 @@
 import { cloneDeep } from 'lodash';
 import { validWorkingHours } from './valid_checks/workingHours';
 import { validConsecutiveDays } from './valid_checks/consecutiveDays';
+import { validShiftOccupation } from './valid_checks/shiftOccupation';
 
 export function runScheduler(employeeInformation, shiftInformation, dateArray) {
   shiftInformation.unshift({ id: ' ', name: ' ' });
@@ -75,6 +76,11 @@ export function runScheduler(employeeInformation, shiftInformation, dateArray) {
       if (!validConsecutiveDays(day, employee, wipPlan, employeeInformation))
         continue;
 
+      if (employee > 0) {
+        if (!validShiftOccupation(day, employee, wipPlan, shiftInformation))
+          continue;
+      }
+
       if (employee == employeeCount - 1 && day == dayCount - 1) {
         resultingPlans.push({ assignedShifts: cloneDeep(wipPlan) });
       }
@@ -110,22 +116,7 @@ export function runScheduler(employeeInformation, shiftInformation, dateArray) {
     }
   }
 
-  console.log(resultingPlans.length);
-  // resultingPlans.forEach((plan) =>
-  //   console.log(`${plan[0][0]} ${plan[0][1]} ${plan[1][0]} ${plan[1][1]}`)
-  // );
+  console.log('Number of plans: ', resultingPlans.length);
 
   return resultingPlans;
-}
-
-function checkCount(plan, day) {
-  let dayCount = 1;
-  for (let i = day - 1; i >= 0; i--) {
-    if (plan[day] === plan[i]) {
-      dayCount++;
-    } else {
-      break;
-    }
-  }
-  return dayCount;
 }
