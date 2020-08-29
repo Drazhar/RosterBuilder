@@ -31,11 +31,36 @@ export function runScheduler(employeeInformation, shiftInformation, dateArray) {
     0
   );
   let requiredWorkingHours = 0;
+  let weekendShiftCount = 0;
   for (let i = 1; i < shiftCount; i++) {
+    weekendShiftCount += shiftInformation[i].requiredEmployees;
     requiredWorkingHours +=
       shiftInformation[i].requiredEmployees *
       shiftInformation[i].workingHours *
       dayCount;
+  }
+  let weekendCount = 0;
+  for (let i = 0; i < dayCount; i++) {
+    if (i === dayCount - 1) {
+      if (dateArray[i] === 6) {
+        weekendCount++;
+      }
+    } else {
+      if (dateArray[i] === 0) {
+        weekendCount++;
+      }
+    }
+  }
+
+  const minMaxWeekendShiftsPerEmployee = [];
+  let minMaxCount = (weekendCount * weekendShiftCount) / employeeCount;
+  if ((weekendCount * weekendShiftCount) % employeeCount === 0) {
+    let minMaxCount = (weekendCount * weekendShiftCount) / employeeCount;
+    minMaxWeekendShiftsPerEmployee.push(minMaxCount);
+    minMaxWeekendShiftsPerEmployee.push(minMaxCount);
+  } else {
+    minMaxWeekendShiftsPerEmployee.push(Math.floor(minMaxCount));
+    minMaxWeekendShiftsPerEmployee.push(Math.ceil(minMaxCount));
   }
   //----------------------------------------
 

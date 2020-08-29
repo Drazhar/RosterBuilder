@@ -3,19 +3,12 @@
 
 export function getDateArr(startDate, endDate) {
   let dayArr = [];
-  const msPerDay = 24 * 60 * 60 * 1000;
-  const daysCount = (endDate - startDate) / msPerDay;
-
-  for (let nDay = 0; nDay < daysCount; nDay++) {
-    let newDay = new Date(
-      Date.UTC(
-        startDate.getFullYear(),
-        startDate.getMonth(),
-        startDate.getDay()
-      )
-    );
-    newDay.setDate(startDate.getDate() + nDay);
-    dayArr.push(newDay.getDay());
+  let loop = startDate;
+  while (loop < endDate) {
+    dayArr.push(loop.getDay());
+    let newDate = loop.setDate(loop.getDate() + 1);
+    loop = new Date(newDate);
   }
+
   return dayArr;
 }

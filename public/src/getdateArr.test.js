@@ -26,3 +26,12 @@ test('Base case 3', () => {
 
   expect(result).toStrictEqual([3, 4]);
 });
+
+test('Base case 4', () => {
+  let result = getDateArr(
+    new Date(Date.UTC(2020, 9, 11)),
+    new Date(Date.UTC(2020, 9, 15))
+  );
+
+  expect(result).toStrictEqual([0, 1, 2, 3]);
+});

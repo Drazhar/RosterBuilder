@@ -139,13 +139,11 @@ class shiftSchedule extends LitElement {
       <div class="wrapper">
         <table>
           <col span="1" class="fixedWidth" />
-          ${this.dateArray.map((item, index) => {
+          ${this.dateArray.map((item) => {
             if (item === 0 || item === 6) {
               return html`<col span="1" style="background-color:lightgrey" />`;
-            } else if (item === 1) {
-              return html`<col span="5" />`;
-            } else if (index === 0) {
-              return html`<col span="${6 - item}" />`;
+            } else {
+              return html`<col span="1" />`;
             }
           })}
           <thead>
