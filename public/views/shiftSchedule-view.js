@@ -86,6 +86,8 @@ class shiftSchedule extends LitElement {
   async btnCreateSchedule() {
     this.myWorker = new Worker();
 
+    console.log('shiftInformation', this.shifts);
+
     await this.createSchedule();
   }
 
@@ -95,15 +97,14 @@ class shiftSchedule extends LitElement {
       shifts: this.shifts,
       dateArray: this.dateArray,
     };
-
     this.myWorker.postMessage(data);
 
     this.myWorker.onmessage = (e) => {
       this.scheduleToDisplay = e.data;
-      localStorage.setItem(
-        'lastSchedule',
-        JSON.stringify(this.scheduleToDisplay)
-      );
+      // localStorage.setItem(
+      //   'lastSchedule',
+      //   JSON.stringify(this.scheduleToDisplay)
+      // );
 
       this.indexToDisplay = 0;
 

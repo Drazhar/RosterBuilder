@@ -1,13 +1,46 @@
 import { cloneDeep } from 'lodash';
+import { validWorkingHours } from './valid_checks/workingHours';
+import { validConsecutiveDays } from './valid_checks/consecutiveDays';
 
 export function runScheduler(employeeInformation, shiftInformation, dateArray) {
   shiftInformation.unshift({ id: ' ', name: ' ' });
 
+  // Parse Strings to numbers
+  for (let i = 0; i < employeeInformation.length; i++) {
+    employeeInformation[i].plannedWorkingTime = Number(
+      employeeInformation[i].plannedWorkingTime
+    );
+  }
+
+  for (let i = 0; i < shiftInformation.length; i++) {
+    shiftInformation[i].workingHours = Number(shiftInformation[i].workingHours);
+    shiftInformation[i].requiredEmployees = Number(
+      shiftInformation[i].requiredEmployees
+    );
+  }
+
+  // Calculate base parameters
+  const dayCount = dateArray.length;
+  const employeeCount = employeeInformation.length;
+  const shiftCount = shiftInformation.length;
+  const availableWorkingHours = employeeInformation.reduce(
+    (result, value) => result + value.plannedWorkingTime,
+    0
+  );
+  let requiredWorkingHours = 0;
+  for (let i = 1; i < shiftCount; i++) {
+    requiredWorkingHours +=
+      shiftInformation[i].requiredEmployees *
+      shiftInformation[i].workingHours *
+      dayCount;
+  }
+  //----------------------------------------
+
   const resultingPlans = [];
   const wipPlan = [];
 
-  for (let i = 0; i < employeeInformation.length; i++) {
-    wipPlan.push(new Array(dateArray.length).fill(-1));
+  for (let i = 0; i < employeeCount; i++) {
+    wipPlan.push(new Array(dayCount).fill(-1));
   }
 
   let employee = 0;
@@ -17,20 +50,33 @@ export function runScheduler(employeeInformation, shiftInformation, dateArray) {
   while (!isFinished) {
     wipPlan[employee][day]++;
 
+    // Check if it should backtrack, assigns unvisited value (-1) and push
+    // wipPlan to the result if finished.
     let shouldBacktrack = false;
-    // Todo: Check if valid
+    if (wipPlan[employee][day] >= shiftCount) {
+      shouldBacktrack = true;
+      wipPlan[employee][day] = -1;
+    }
 
-    // Check if it should backtrack, assigns unvisited value and push wipPlan if
-    // finished.
     if (!shouldBacktrack) {
-      if (wipPlan[employee][day] >= shiftInformation.length) {
-        shouldBacktrack = true;
-        wipPlan[employee][day] = -1;
-      } else if (
-        employee == wipPlan.length - 1 &&
-        day == dateArray.length - 1
-      ) {
-        resultingPlans.push(cloneDeep(wipPlan));
+      // Check if valid. If not valid -> continue
+      if (
+        !validWorkingHours(
+          dayCount,
+          day,
+          employee,
+          wipPlan,
+          shiftInformation,
+          employeeInformation
+        )
+      )
+        continue;
+
+      if (!validConsecutiveDays(day, employee, wipPlan, employeeInformation))
+        continue;
+
+      if (employee == employeeCount - 1 && day == dayCount - 1) {
+        resultingPlans.push({ assignedShifts: cloneDeep(wipPlan) });
       }
     }
 
@@ -43,15 +89,15 @@ export function runScheduler(employeeInformation, shiftInformation, dateArray) {
           isFinished = true;
           break;
         }
-        day = dateArray.length - 1;
+        day = dayCount - 1;
       }
     } else {
       day++;
-      if (day >= dateArray.length) {
+      if (day >= dayCount) {
         employee++;
-        if (employee >= wipPlan.length) {
+        if (employee >= employeeCount) {
           employee--;
-          day = dateArray.length - 1;
+          day = dayCount - 1;
         } else {
           day = 0;
         }
@@ -59,58 +105,27 @@ export function runScheduler(employeeInformation, shiftInformation, dateArray) {
     }
 
     // Check if finished
-    if (wipPlan[0][0] > shiftInformation.length) {
+    if (wipPlan[0][0] > shiftCount) {
       isFinished = true;
     }
   }
 
   console.log(resultingPlans.length);
-  resultingPlans.forEach((plan) =>
-    console.log(`${plan[0][0]} ${plan[0][1]} ${plan[1][0]} ${plan[1][1]}`)
-  );
+  // resultingPlans.forEach((plan) =>
+  //   console.log(`${plan[0][0]} ${plan[0][1]} ${plan[1][0]} ${plan[1][1]}`)
+  // );
 
-  return [
-    {
-      quality: { qualityRating: 1, secondRating: 2 },
-      assignedShifts: [
-        [1, 1, 1, 1, 0, 0, 0],
-        [0, 0, 0, 0, 1, 1, 1],
-      ],
-    },
-  ];
+  return resultingPlans;
 }
 
-function DFS(
-  wipPlan,
-  employee,
-  day,
-  dateArray,
-  employeeInformation,
-  shiftInformation,
-  resultingPlans
-) {
-  DFS(
-    wipPlan,
-    employee,
-    day,
-    dateArray,
-    employeeInformation,
-    shiftInformation,
-    resultingPlans
-  );
-
-  /* DFS logic:
-- Select the next entry
-- Check if shift 0 is possible
-- If yes assign shift 0 and continue
-- If no check if shift 1 is possible
-- If yes assign shift 1 and continue
-- Redo for n - 1 number of shifts
-- Check if shift n is possible
-- If yes assign shift n and continue
-- If no go to prev entry and increase the shifts till n shifts
-
-- At last entry push plan to result and go back until a shift number can be
-  increased. If none can be increased, all possibilities are tested.
-  */
+function checkCount(plan, day) {
+  let dayCount = 1;
+  for (let i = day - 1; i >= 0; i--) {
+    if (plan[day] === plan[i]) {
+      dayCount++;
+    } else {
+      break;
+    }
+  }
+  return dayCount;
 }
