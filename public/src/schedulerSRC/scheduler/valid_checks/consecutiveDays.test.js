@@ -62,7 +62,7 @@ test('No shift switch 02', () => {
     validConsecutiveDays(
       5,
       0,
-      [[0, 2, 2, 0, 0, 1]],
+      [[2, 2, 0, 0, 0, 1]],
       [
         {
           consecutiveWorkingDays: {

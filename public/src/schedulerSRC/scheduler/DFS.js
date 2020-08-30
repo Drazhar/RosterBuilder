@@ -11,6 +11,8 @@ import { adjustPlannedWorkingHours } from './helper_functions/adjustWorkingHours
 import { getMinMaxWeekendNight } from './helper_functions/minMaxWeekendNight';
 import { getShiftDayCountPerEmployee } from './helper_functions/shiftDayCountPerEmployee';
 import { validIndividualShiftCount } from './valid_checks/individualShiftCount';
+import { convertShiftWishesVacation } from './helper_functions/convertShiftWishesVacation';
+import { validWishes } from './valid_checks/wishes';
 
 export function runScheduler(employeeInformation, shiftInformation, dateArray) {
   shiftInformation.unshift({ id: ' ', name: ' ' });
@@ -72,6 +74,7 @@ export function runScheduler(employeeInformation, shiftInformation, dateArray) {
     employeeInformation
   );
 
+  convertShiftWishesVacation(employeeInformation, shiftInformation);
   //----------------------------------------
 
   const resultingPlans = [];
@@ -95,6 +98,22 @@ export function runScheduler(employeeInformation, shiftInformation, dateArray) {
     }
 
     if (!shouldBacktrack) {
+      if (
+        !validWishes(
+          employeeInformation[employee].shiftVacation[day],
+          wipPlan[employee][day]
+        )
+      )
+        continue;
+
+      if (
+        !validWishes(
+          employeeInformation[employee].shiftWishes[day],
+          wipPlan[employee][day]
+        )
+      )
+        continue;
+
       if (
         !validWorkingHours(
           dayCount,

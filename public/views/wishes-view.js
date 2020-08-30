@@ -57,6 +57,7 @@ class WishesView extends LitElement {
     const changedValue = event.path[0].value;
 
     this.employees[employeeIndex].shiftWishes[wishIndex] = changedValue;
+    this.updateEmployeeSession();
     this.requestUpdate();
   }
 
@@ -67,6 +68,7 @@ class WishesView extends LitElement {
     const changedValue = event.path[0].value;
 
     this.employees[employeeIndex].shiftVacation[vacIndex] = changedValue;
+    this.updateEmployeeSession();
     this.requestUpdate();
   }
 
@@ -77,6 +79,7 @@ class WishesView extends LitElement {
         this.employees[iE].shiftWishes[iW] = 0;
       }
     }
+    this.updateEmployeeSession();
     this.requestUpdate();
   }
 
@@ -87,15 +90,20 @@ class WishesView extends LitElement {
         this.employees[iE].shiftVacation[iV] = 0;
       }
     }
+    this.updateEmployeeSession();
     this.requestUpdate();
   }
 
   disconnectedCallback() {
+    this.updateEmployeeSession();
+    super.disconnectedCallback();
+  }
+
+  updateEmployeeSession() {
     window.localStorage.setItem(
       'definedEmployees',
       JSON.stringify(this.employees)
     );
-    super.disconnectedCallback();
   }
 
   render() {
