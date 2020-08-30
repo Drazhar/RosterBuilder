@@ -17,6 +17,8 @@ export function validConsecutiveDays(
       let minDaysOff = employeeInformation[employee].minConsecutiveDaysOff;
       if (wipPlan[employee][day] === 1 && lastShift === 2) {
         minDaysOff++;
+      } else if (wipPlan[employee][day] === 2 && lastShift === 1) {
+        minDaysOff--;
       }
       if (daysOffCount < minDaysOff) {
         return false;
