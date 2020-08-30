@@ -5,6 +5,10 @@ import { validShiftOccupation } from './valid_checks/shiftOccupation';
 import { validAllShiftsOccupied } from './valid_checks/allShiftsOccupied';
 import { validNonStopWeekend } from './valid_checks/nonStopWeekend';
 import { validMinMaxWeekendCount } from './valid_checks/minMaxWeekendCount';
+import { getMinMaxWeekendCount } from './helper_functions/minMaxWeekendCount';
+import { getWeekendCount } from './helper_functions/weekendCount';
+import { adjustPlannedWorkingHours } from './helper_functions/adjustWorkingHours';
+import { getMinMaxWeekendNight } from './helper_functions/minMaxWeekendNight';
 
 export function runScheduler(employeeInformation, shiftInformation, dateArray) {
   shiftInformation.unshift({ id: ' ', name: ' ' });
@@ -40,29 +44,26 @@ export function runScheduler(employeeInformation, shiftInformation, dateArray) {
       shiftInformation[i].workingHours *
       dayCount;
   }
-  let weekendCount = 0;
-  for (let i = 0; i < dayCount; i++) {
-    if (i === dayCount - 1) {
-      if (dateArray[i] === 6) {
-        weekendCount++;
-      }
-    } else {
-      if (dateArray[i] === 0) {
-        weekendCount++;
-      }
-    }
-  }
 
-  const minMaxWeekendShiftsPerEmployee = [];
-  let minMaxCount = (weekendCount * weekendShiftCount) / employeeCount;
-  if ((weekendCount * weekendShiftCount) % employeeCount === 0) {
-    let minMaxCount = (weekendCount * weekendShiftCount) / employeeCount;
-    minMaxWeekendShiftsPerEmployee.push(minMaxCount);
-    minMaxWeekendShiftsPerEmployee.push(minMaxCount);
-  } else {
-    minMaxWeekendShiftsPerEmployee.push(Math.floor(minMaxCount));
-    minMaxWeekendShiftsPerEmployee.push(Math.ceil(minMaxCount));
-  }
+  const weekendCount = getWeekendCount(dayCount, dateArray);
+
+  const minMaxWeekendShiftsPerEmployee = getMinMaxWeekendCount(
+    weekendCount,
+    weekendShiftCount,
+    employeeCount
+  );
+
+  const minMaxWeekendNightShifts = getMinMaxWeekendNight(
+    weekendCount,
+    shiftInformation,
+    employeeCount
+  );
+
+  adjustPlannedWorkingHours(
+    availableWorkingHours,
+    requiredWorkingHours,
+    employeeInformation
+  );
   //----------------------------------------
 
   const resultingPlans = [];
@@ -117,6 +118,16 @@ export function runScheduler(employeeInformation, shiftInformation, dateArray) {
             wipPlan[employee],
             minMaxWeekendShiftsPerEmployee,
             dateArray
+          )
+        )
+          continue;
+
+        if (
+          !validMinMaxWeekendCount(
+            wipPlan[employee],
+            minMaxWeekendNightShifts,
+            dateArray,
+            2
           )
         )
           continue;

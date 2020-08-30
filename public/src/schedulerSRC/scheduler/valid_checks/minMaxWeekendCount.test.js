@@ -64,3 +64,45 @@ test('05', () => {
     )
   ).toBe(false);
 });
+
+test('06', () => {
+  const employeePlan = [1, 0, 0, 0, 0, 0, 1];
+  const minMaxWeekendNightShifts = [1, 1];
+  const dateArray = [0, 1, 2, 3, 4, 5, 6];
+  expect(
+    validMinMaxWeekendCount(
+      employeePlan,
+      minMaxWeekendNightShifts,
+      dateArray,
+      2
+    )
+  ).toBe(false);
+});
+
+test('07', () => {
+  const employeePlan = [1, 0, 0, 0, 0, 0, 2];
+  const minMaxWeekendNightShifts = [1, 1];
+  const dateArray = [0, 1, 2, 3, 4, 5, 6];
+  expect(
+    validMinMaxWeekendCount(
+      employeePlan,
+      minMaxWeekendNightShifts,
+      dateArray,
+      2
+    )
+  ).toBe(true);
+});
+
+test('08', () => {
+  const employeePlan = [0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 1, 1];
+  const minMaxWeekendNightShifts = [1, 1];
+  const dateArray = [0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6];
+  expect(
+    validMinMaxWeekendCount(
+      employeePlan,
+      minMaxWeekendNightShifts,
+      dateArray,
+      2
+    )
+  ).toBe(false);
+});

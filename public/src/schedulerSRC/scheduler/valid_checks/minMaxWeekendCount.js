@@ -1,7 +1,8 @@
 export function validMinMaxWeekendCount(
   employeePlan,
   minMaxWeekendShiftsPerEmployee,
-  dateArray
+  dateArray,
+  shiftToCheck = 1
 ) {
   let weekdayToCheck = 0;
   let weekendCounter = 0;
@@ -10,7 +11,7 @@ export function validMinMaxWeekendCount(
       weekdayToCheck = 6;
     }
 
-    if (dateArray[i] === weekdayToCheck && employeePlan[i] > 0) {
+    if (dateArray[i] === weekdayToCheck && employeePlan[i] >= shiftToCheck) {
       weekendCounter++;
     }
   }
