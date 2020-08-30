@@ -39,6 +39,15 @@ class WishesView extends LitElement {
         window.localStorage.getItem('definedEmployees')
       );
     }
+
+    this.employees.forEach((employee) => {
+      if (employee.shiftVacation.length != this.dateArray.length) {
+        adjustWishLength(employee.shiftVacation, this.dateArray.length);
+      }
+      if (employee.shiftWishes.length != this.dateArray.length) {
+        adjustWishLength(employee.shiftWishes, this.dateArray.length);
+      }
+    });
   }
 
   wishChanged(event) {
@@ -312,3 +321,15 @@ class WishesView extends LitElement {
 }
 
 customElements.define('wishes-view', WishesView);
+
+function adjustWishLength(wishes, count) {
+  if (wishes.length < count) {
+    for (let i = wishes.length; i < count; i++) {
+      wishes.push(0);
+    }
+  } else {
+    for (let i = wishes.length; i > count; i--) {
+      wishes.pop();
+    }
+  }
+}
