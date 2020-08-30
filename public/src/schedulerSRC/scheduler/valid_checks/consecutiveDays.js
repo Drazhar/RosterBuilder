@@ -1,5 +1,4 @@
 import { checkCount } from './../helper_functions/checkCount';
-import { cloneDeep } from 'lodash';
 
 export function validConsecutiveDays(
   day,
@@ -10,10 +9,16 @@ export function validConsecutiveDays(
   if (day > 0) {
     if (wipPlan[employee][day] > 0 && wipPlan[employee][day - 1] === 0) {
       // Min days off between shift blocks
-      if (
-        checkCount(wipPlan[employee], day - 1) <
-        employeeInformation[employee].minConsecutiveDaysOff
-      ) {
+      let [daysOffCount, lastShift] = checkCount(
+        wipPlan[employee],
+        day - 1,
+        true
+      );
+      let minDaysOff = employeeInformation[employee].minConsecutiveDaysOff;
+      if (wipPlan[employee][day] === 1 && lastShift === 2) {
+        minDaysOff++;
+      }
+      if (daysOffCount < minDaysOff) {
         return false;
       }
     } else if (
