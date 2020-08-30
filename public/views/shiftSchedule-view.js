@@ -150,7 +150,7 @@ class shiftSchedule extends LitElement {
             <tr>
               <th></th>
               ${this.dateArray.map((item, index) => {
-                let day = this.startDate.getDate() + index;
+                let day = this.startDate.getDate() + index - 1;
                 return html`<th>${day}.</th>`;
               })}
             </tr>

@@ -4,6 +4,7 @@ import { validConsecutiveDays } from './valid_checks/consecutiveDays';
 import { validShiftOccupation } from './valid_checks/shiftOccupation';
 import { validAllShiftsOccupied } from './valid_checks/allShiftsOccupied';
 import { validNonStopWeekend } from './valid_checks/nonStopWeekend';
+import { validMinMaxWeekendCount } from './valid_checks/minMaxWeekendCount';
 
 export function runScheduler(employeeInformation, shiftInformation, dateArray) {
   shiftInformation.unshift({ id: ' ', name: ' ' });
@@ -85,7 +86,6 @@ export function runScheduler(employeeInformation, shiftInformation, dateArray) {
     }
 
     if (!shouldBacktrack) {
-      // Check if valid. If not valid -> continue
       if (
         !validWorkingHours(
           dayCount,
@@ -106,6 +106,17 @@ export function runScheduler(employeeInformation, shiftInformation, dateArray) {
           !validNonStopWeekend(
             wipPlan[employee][day],
             wipPlan[employee][day - 1]
+          )
+        )
+          continue;
+      }
+
+      if (day === dayCount - 1) {
+        if (
+          !validMinMaxWeekendCount(
+            wipPlan[employee],
+            minMaxWeekendShiftsPerEmployee,
+            dateArray
           )
         )
           continue;
